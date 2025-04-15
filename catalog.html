@@ -1,0 +1,1238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FSM PRIME | Premium Product Catalog</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --primary: #ff4bcb; /* Blueish purple */
+      --secondary: #651fff; /* Deeper purple */
+      --accent: #005bff; /* Bright blue accent */
+      --dark: #121212;
+      --darker: #0a0a0a;
+      --light: #f8f9fa;
+      --transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      
+      /* Dark mode colors */
+      --bg-dark: #121212;
+      --card-dark: #1e1e1e;
+      --text-dark: #f0f0f0;
+      --border-dark: #333;
+      
+      /* Light mode colors */
+      --bg-light: #f8f9fa;
+      --card-light: white;
+      --text-light: #333;
+      --border-light: #e0e0e0;
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Montserrat', sans-serif;
+      background: var(--bg-dark);
+      color: var(--text-dark);
+      min-height: 100vh;
+      overflow-x: hidden;
+      transition: background 0.3s ease, color 0.3s ease;
+    }
+    
+    body.light-mode {
+      background: var(--bg-light);
+      color: var(--text-light);
+    }
+    
+    /* Theme Toggle */
+    .theme-toggle {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 100;
+      background: rgba(124, 77, 255, 0.2);
+      border: none;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: var(--primary);
+      font-size: 1.2rem;
+      transition: var(--transition);
+    }
+    
+    .theme-toggle:hover {
+      background: rgba(124, 77, 255, 0.3);
+      transform: scale(1.1);
+    }
+    
+    /* Main Container */
+    .catalog-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 2rem;
+      position: relative;
+      z-index: 1;
+    }
+    
+    /* Header */
+    .header {
+      text-align: center;
+      margin-bottom: 3rem;
+      position: relative;
+    }
+    
+    .header h1 {
+      font-size: 4rem;
+      font-weight: 900;
+      background: linear-gradient(45deg, var(--primary), var(--accent));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      margin-bottom: 0.5rem;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+    }
+    
+    .header .subtitle {
+      font-size: 1.8rem;
+      font-weight: 600;
+      color: var(--text-dark);
+      margin-bottom: 1rem;
+      position: relative;
+      display: inline-block;
+    }
+    
+    body.light-mode .header .subtitle {
+      color: #6c757d;
+    }
+    
+    .header .subtitle::after {
+      content: '';
+      position: absolute;
+      bottom: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 80px;
+      height: 3px;
+      background: linear-gradient(45deg, var(--primary), var(--accent));
+      border-radius: 3px;
+    }
+    
+    .header p {
+      font-size: 1.2rem;
+      color: var(--text-dark);
+      max-width: 600px;
+      margin: 0 auto;
+      opacity: 0.8;
+    }
+    
+    body.light-mode .header p {
+      color: #6c757d;
+    }
+    
+    /* Categories Grid */
+    .categories-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 2rem;
+      margin-bottom: 4rem;
+    }
+    
+    .category-card {
+      background: var(--card-dark);
+      border-radius: 16px;
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+      padding: 2rem;
+      text-align: center;
+      cursor: pointer;
+      transition: var(--transition);
+      position: relative;
+      overflow: hidden;
+      min-height: 200px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      border: 1px solid var(--border-dark);
+    }
+    
+    body.light-mode .category-card {
+      background: var(--card-light);
+      border: 1px solid var(--border-light);
+      box-shadow: 0 10px 30px rgba(124, 77, 255, 0.1);
+    }
+    
+    .category-card:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
+    }
+    
+    body.light-mode .category-card:hover {
+      box-shadow: 0 15px 40px rgba(124, 77, 255, 0.2);
+    }
+    
+    .category-card h2 {
+      font-size: 1.8rem;
+      margin-bottom: 0.5rem;
+      position: relative;
+      display: inline-block;
+      color: var(--text-dark);
+    }
+    
+    body.light-mode .category-card h2 {
+      color: #495057;
+    }
+    
+    .category-card h2::after {
+      content: '';
+      position: absolute;
+      bottom: -8px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 40px;
+      height: 3px;
+      background: linear-gradient(45deg, var(--primary), var(--accent));
+      border-radius: 3px;
+    }
+    
+    .category-card .product-count {
+      background: rgba(124, 77, 255, 0.1);
+      color: var(--primary);
+      padding: 0.3rem 0.8rem;
+      border-radius: 20px;
+      font-size: 0.9rem;
+      margin-top: 1rem;
+      font-weight: 600;
+    }
+    
+    .category-card .category-total {
+      margin-top: 1rem;
+      font-weight: 600;
+      color: var(--primary);
+      font-size: 1.1rem;
+    }
+    
+    /* Products Section */
+    .products-section {
+      display: none;
+      animation: fadeIn 0.8s ease-out;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .back-button {
+      display: inline-flex;
+      align-items: center;
+      background: var(--card-dark);
+      padding: 0.8rem 1.5rem;
+      border-radius: 50px;
+      margin-bottom: 2rem;
+      cursor: pointer;
+      transition: var(--transition);
+      border: 1px solid rgba(124, 77, 255, 0.2);
+      color: var(--primary);
+      font-size: 1rem;
+      font-weight: 600;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+    
+    body.light-mode .back-button {
+      background: var(--card-light);
+      box-shadow: 0 5px 15px rgba(124, 77, 255, 0.1);
+    }
+    
+    .back-button:hover {
+      background: rgba(124, 77, 255, 0.1);
+      transform: translateX(-5px);
+    }
+    
+    .back-button i {
+      margin-right: 8px;
+    }
+    
+    /* Bulk Quantity Selector */
+    .bulk-quantity-selector {
+      display: flex;
+      align-items: center;
+      margin-bottom: 2rem;
+      background: var(--card-dark);
+      padding: 1rem;
+      border-radius: 12px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      border: 1px solid var(--border-dark);
+    }
+    
+    body.light-mode .bulk-quantity-selector {
+      background: var(--card-light);
+      border: 1px solid var(--border-light);
+      box-shadow: 0 5px 15px rgba(124, 77, 255, 0.1);
+    }
+    
+    .bulk-quantity-label {
+      margin-right: 1rem;
+      font-weight: 600;
+      color: var(--text-dark);
+    }
+    
+    body.light-mode .bulk-quantity-label {
+      color: #495057;
+    }
+    
+    .bulk-quantity-input {
+      width: 60px;
+      text-align: center;
+      margin: 0 0.5rem;
+      border: 1px solid rgba(124, 77, 255, 0.2);
+      border-radius: 5px;
+      padding: 0.5rem;
+      font-weight: 600;
+      background: var(--card-dark);
+      color: var(--text-dark);
+    }
+    
+    body.light-mode .bulk-quantity-input {
+      background: var(--card-light);
+    }
+    
+    .apply-bulk-btn {
+      background: rgba(124, 77, 255, 0.1);
+      color: var(--primary);
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: var(--transition);
+      font-weight: 600;
+    }
+    
+    .apply-bulk-btn:hover {
+      background: rgba(124, 77, 255, 0.2);
+    }
+    
+    .products-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 2rem;
+    }
+    
+    .product-card {
+      background: var(--card-dark);
+      border-radius: 12px;
+      overflow: hidden;
+      transition: var(--transition);
+      position: relative;
+      border: 1px solid var(--border-dark);
+      cursor: pointer;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+    
+    body.light-mode .product-card {
+      background: var(--card-light);
+      border: 1px solid var(--border-light);
+      box-shadow: 0 5px 20px rgba(124, 77, 255, 0.1);
+    }
+    
+    .product-card:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+    }
+    
+    body.light-mode .product-card:hover {
+      box-shadow: 0 15px 30px rgba(124, 77, 255, 0.2);
+    }
+    
+    .product-image {
+      width: 100%;
+      height: 200px;
+      object-fit: contain;
+      background: rgba(0, 0, 0, 0.1);
+      padding: 1rem;
+      border-bottom: 1px solid var(--border-dark);
+    }
+    
+    body.light-mode .product-image {
+      background: rgba(255, 255, 255, 0.8);
+      border-bottom: 1px solid var(--border-light);
+    }
+    
+    .product-info {
+      padding: 1.5rem;
+    }
+    
+    .product-name {
+  font-size: 1.1rem;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  color: #495057;
+  /* Add these for full compatibility */
+  display: -moz-box;
+  -moz-line-clamp: 2;
+  -moz-box-orient: vertical;
+  line-clamp: 2;
+  box-orient: vertical;
+  }
+    
+    body.light-mode .product-name {
+      color: #495057;
+    }
+    
+    .product-price {
+      color: var(--primary);
+      font-size: 1.3rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+    
+    .product-price::before {
+      content: '₹';
+      margin-right: 2px;
+    }
+    
+    .product-weight {
+      font-size: 0.9rem;
+      color: var(--text-dark);
+      opacity: 0.8;
+      margin-bottom: 1rem;
+    }
+    
+    body.light-mode .product-weight {
+      color: #6c757d;
+    }
+    
+    .quantity-selector {
+      display: flex;
+      align-items: center;
+      margin-top: 1rem;
+    }
+    
+    .quantity-btn {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: rgba(124, 77, 255, 0.1);
+      border: none;
+      color: var(--primary);
+      font-weight: bold;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: var(--transition);
+    }
+    
+    .quantity-btn:hover {
+      background: rgba(124, 77, 255, 0.2);
+    }
+    
+    .quantity-input {
+      width: 50px;
+      text-align: center;
+      margin: 0 0.5rem;
+      border: 1px solid rgba(124, 77, 255, 0.2);
+      border-radius: 5px;
+      padding: 0.3rem;
+      font-weight: 600;
+      background: var(--card-dark);
+      color: var(--text-dark);
+    }
+    
+    body.light-mode .quantity-input {
+      background: var(--card-light);
+    }
+    
+    /* Summary Section */
+    .summary-section {
+      background: var(--card-dark);
+      border-radius: 16px;
+      padding: 2rem;
+      margin-top: 3rem;
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+      border: 1px solid var(--border-dark);
+    }
+    
+    body.light-mode .summary-section {
+      background: var(--card-light);
+      border: 1px solid var(--border-light);
+      box-shadow: 0 10px 30px rgba(124, 77, 255, 0.1);
+    }
+    
+    .summary-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 1.5rem;
+      color: var(--primary);
+      text-align: center;
+    }
+    
+    .category-summary {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 1rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px dashed rgba(124, 77, 255, 0.3);
+    }
+    
+    .category-summary-name {
+      font-weight: 600;
+      color: var(--text-dark);
+    }
+    
+    body.light-mode .category-summary-name {
+      color: #495057;
+    }
+    
+    .category-summary-total {
+      font-weight: 700;
+      color: var(--primary);
+    }
+    
+    .final-total {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 1.5rem;
+      padding-top: 1.5rem;
+      border-top: 2px solid rgba(124, 77, 255, 0.3);
+      font-size: 1.2rem;
+      font-weight: 700;
+    }
+    
+    .final-total-label {
+      color: var(--text-dark);
+    }
+    
+    body.light-mode .final-total-label {
+      color: #495057;
+    }
+    
+    .final-total-amount {
+      color: var(--primary);
+    }
+    
+    /* Enhanced Product Modal */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(10px);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease-out;
+    }
+    
+    .modal-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+    
+    .product-modal {
+      background: var(--card-dark);
+      border-radius: 20px;
+      width: 90%;
+      max-width: 900px;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+      transform: scale(0.9);
+      transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.4);
+      position: relative;
+      border: 1px solid var(--border-dark);
+    }
+    
+    body.light-mode .product-modal {
+      background: var(--card-light);
+      border: 1px solid var(--border-light);
+    }
+    
+    .modal-overlay.active .product-modal {
+      transform: scale(1);
+    }
+    
+    .modal-close {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: rgba(124, 77, 255, 0.1);
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      transition: var(--transition);
+      z-index: 10;
+      border: none;
+      color: var(--primary);
+      font-size: 1.2rem;
+    }
+    
+    .modal-close:hover {
+      background: var(--primary);
+      color: white;
+      transform: rotate(90deg);
+    }
+    
+    .modal-content {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+      padding: 3rem;
+    }
+    
+    @media (max-width: 768px) {
+      .modal-content {
+        grid-template-columns: 1fr;
+        padding: 2rem;
+      }
+    }
+    
+    .modal-images {
+      position: relative;
+    }
+    
+    .modal-main-image {
+      width: 100%;
+      height: 400px;
+      object-fit: contain;
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 12px;
+      margin-bottom: 1rem;
+      border: 1px solid var(--border-dark);
+    }
+    
+    body.light-mode .modal-main-image {
+      background: rgba(255, 255, 255, 0.8);
+      border: 1px solid var(--border-light);
+    }
+    
+    .modal-details {
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .modal-title {
+      font-size: 2.2rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      color: var(--text-dark);
+    }
+    
+    body.light-mode .modal-title {
+      color: #495057;
+    }
+    
+    .modal-category {
+      display: inline-block;
+      background: rgba(124, 77, 255, 0.1);
+      color: var(--primary);
+      padding: 0.3rem 1rem;
+      border-radius: 20px;
+      font-size: 0.9rem;
+      margin-bottom: 1.5rem;
+      font-weight: 600;
+    }
+    
+    .modal-price {
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--primary);
+      margin-bottom: 1.5rem;
+    }
+    
+    .modal-price::before {
+      content: '₹';
+      margin-right: 5px;
+    }
+    
+    .modal-weight {
+      font-size: 1.1rem;
+      margin-bottom: 2rem;
+      color: var(--text-dark);
+      opacity: 0.8;
+    }
+    
+    body.light-mode .modal-weight {
+      color: #6c757d;
+    }
+    
+    .modal-description {
+      margin-bottom: 2rem;
+      line-height: 1.6;
+      color: var(--text-dark);
+      opacity: 0.9;
+    }
+    
+    body.light-mode .modal-description {
+      color: #495057;
+    }
+    
+    .modal-quantity {
+      display: flex;
+      align-items: center;
+      margin-bottom: 2rem;
+    }
+    
+    .modal-quantity-label {
+      margin-right: 1rem;
+      font-weight: 600;
+      color: var(--text-dark);
+    }
+    
+    body.light-mode .modal-quantity-label {
+      color: #495057;
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+      .header h1 {
+        font-size: 2.5rem;
+      }
+      
+      .header .subtitle {
+        font-size: 1.4rem;
+      }
+      
+      .categories-grid {
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      }
+      
+      .products-grid {
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      }
+      
+      .bulk-quantity-selector {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      
+      .bulk-quantity-label {
+        margin-bottom: 0.5rem;
+      }
+      
+      .modal-main-image {
+        height: 300px;
+      }
+      
+      .modal-title {
+        font-size: 1.8rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Theme Toggle -->
+  <button class="theme-toggle" id="themeToggle">
+    <i class="fas fa-moon"></i>
+  </button>
+  
+  <!-- Enhanced Product Modal -->
+  <div class="modal-overlay" id="productModal">
+    <div class="product-modal">
+      <button class="modal-close" id="modalClose">
+        <i class="fas fa-times"></i>
+      </button>
+      <div class="modal-content" id="modalContent">
+        <!-- Content will be inserted here by JavaScript -->
+      </div>
+    </div>
+  </div>
+  
+  <div class="catalog-container">
+    <div class="header">
+      <h1>FSM PRIME</h1>
+      <div class="subtitle">Product Catalog</div>
+      <p>Discover our exquisite collection of premium gourmet products from around the world</p>
+    </div>
+    
+    <!-- Categories View -->
+    <div id="categoriesView">
+      <div class="categories-grid">
+        
+        <div class="category-card" onclick="showProducts('Baby Foods')">
+          <h2>Baby Foods</h2>
+          <div class="product-count">34 products</div>
+          <div class="category-total" id="categoryTotal-Baby-Foods">Total: ₹0</div>
+        </div>
+        
+        <div class="category-card" onclick="showProducts('Bakery Products')">
+          <h2>Bakery Products</h2>
+          <div class="product-count">5 products</div>
+          <div class="category-total" id="categoryTotal-Bakery-Products">Total: ₹0</div>
+        </div>
+        
+        <div class="category-card" onclick="showProducts('Baking & Cooking Needs')">
+          <h2>Baking & Cooking Needs</h2>
+          <div class="product-count">19 products</div>
+          <div class="category-total" id="categoryTotal-Baking-&-Cooking-Needs">Total: ₹0</div>
+        </div>
+        
+        <div class="category-card" onclick="showProducts('Personal Care & Hygiene')">
+          <h2>Personal Care & Hygiene</h2>
+          <div class="product-count">8 products</div>
+          <div class="category-total" id="categoryTotal-Personal-Care-&-Hygiene">Total: ₹0</div>
+        </div>
+        
+        <div class="category-card" onclick="showProducts('Coffee & Tea')">
+          <h2>Coffee & Tea</h2>
+          <div class="product-count">14 products</div>
+          <div class="category-total" id="categoryTotal-Coffee-&-Tea">Total: ₹0</div>
+        </div>
+        
+        <div class="category-card" onclick="showProducts('Chocolates & Sweets')">
+          <h2>Chocolates & Sweets</h2>
+          <div class="product-count">91 products</div>
+          <div class="category-total" id="categoryTotal-Chocolates-&-Sweets">Total: ₹0</div>
+        </div>
+        
+        <div class="category-card" onclick="showProducts('Cheese')">
+          <h2>Cheese</h2>
+          <div class="product-count">2 products</div>
+          <div class="category-total" id="categoryTotal-Cheese">Total: ₹0</div>
+        </div>
+        
+        <div class="category-card" onclick="showProducts('Dry Fruits & Nuts')">
+          <h2>Dry Fruits & Nuts</h2>
+          <div class="product-count">47 products</div>
+          <div class="category-total" id="categoryTotal-Dry-Fruits-&-Nuts">Total: ₹0</div>
+        </div>
+        
+        <div class="category-card" onclick="showProducts('Edible Oil & Ghee')">
+          <h2>Edible Oil & Ghee</h2>
+          <div class="product-count">11 products</div>
+          <div class="category-total" id="categoryTotal-Edible-Oil-&-Ghee">Total: ₹0</div>
+        </div>
+        
+        <div class="category-card" onclick="showProducts('Frozen Meat')">
+          <h2>Frozen Meat</h2>
+          <div class="product-count">46 products</div>
+          <div class="category-total" id="categoryTotal-Frozen-Meat">Total: ₹0</div>
+        </div>
+        
+        <div class="category-card" onclick="showProducts('Almond Milk')">
+          <h2>Almond Milk</h2>
+          <div class="product-count">1 products</div>
+          <div class="category-total" id="categoryTotal-Almond-Milk">Total: ₹0</div>
+        </div>
+        
+        <div class="category-card" onclick="showProducts('Pasta & Noodles')">
+          <h2>Pasta & Noodles</h2>
+          <div class="product-count">48 products</div>
+          <div class="category-total" id="categoryTotal-Pasta-&-Noodles">Total: ₹0</div>
+        </div>
+        
+        <div class="category-card" onclick="showProducts('Muesli, Oats & Cereal')">
+          <h2>Muesli, Oats & Cereal</h2>
+          <div class="product-count">11 products</div>
+          <div class="category-total" id="categoryTotal-Muesli,-Oats-&-Cereal">Total: ₹0</div>
+        </div>
+        
+        <div class="category-card" onclick="showProducts('Canned Meats')">
+          <h2>Canned Meats</h2>
+          <div class="product-count">10 products</div>
+          <div class="category-total" id="categoryTotal-Canned-Meats">Total: ₹0</div>
+        </div>
+        
+        <div class="category-card" onclick="showProducts('Chilli Sauce')">
+          <h2>Chilli Sauce</h2>
+          <div class="product-count">0 products</div>
+          <div class="category-total" id="categoryTotal-Chilli-Sauce">Total: ₹0</div>
+        </div>
+        
+        <div class="category-card" onclick="showProducts('Snacks & Chips')">
+          <h2>Snacks & Chips</h2>
+          <div class="product-count">24 products</div>
+          <div class="category-total" id="categoryTotal-Snacks-&-Chips">Total: ₹0</div>
+        </div>
+        
+        <div class="category-card" onclick="showProducts('Dressing, Spread & Dip')">
+          <h2>Dressing, Spread & Dip</h2>
+          <div class="product-count">2 products</div>
+          <div class="category-total" id="categoryTotal-Dressing,-Spread-&-Dip">Total: ₹0</div>
+        </div>
+        
+        <div class="category-card" onclick="showProducts('Broth (Stock Water)')">
+          <h2>Broth (Stock Water)</h2>
+          <div class="product-count">1 products</div>
+          <div class="category-total" id="categoryTotal-Broth-(Stock-Water)">Total: ₹0</div>
+        </div>
+        
+        <div class="category-card" onclick="showProducts('Diwali Gift Hamper')">
+          <h2>Diwali Gift Hamper</h2>
+          <div class="product-count">2 products</div>
+          <div class="category-total" id="categoryTotal-Diwali-Gift-Hamper">Total: ₹0</div>
+        </div>
+        
+        <div class="category-card" onclick="showProducts('Nutraceuticals')">
+          <h2>Nutraceuticals</h2>
+          <div class="product-count">44 products</div>
+          <div class="category-total" id="categoryTotal-Nutraceuticals">Total: ₹0</div>
+        </div>
+        
+        <div class="category-card" onclick="showProducts('Staples')">
+          <h2>Staples</h2>
+          <div class="product-count">11 products</div>
+          <div class="category-total" id="categoryTotal-Staples">Total: ₹0</div>
+        </div>
+        
+      </div>
+    </div>
+    
+    <!-- Products View -->
+    <div id="productsView" class="products-section">
+      <button class="back-button" onclick="showCategories()">
+        <i class="fas fa-arrow-left"></i> Back to Categories
+      </button>
+      <h2 id="categoryTitle" class="category-heading"></h2>
+      
+      <!-- Bulk Quantity Selector -->
+      <div class="bulk-quantity-selector" id="bulkQuantitySelector" style="display: none;">
+        <span class="bulk-quantity-label">Apply quantity to all products:</span>
+        <input type="number" min="0" value="0" class="bulk-quantity-input" id="bulkQuantityInput">
+        <button class="apply-bulk-btn" id="applyBulkBtn">Apply</button>
+      </div>
+      
+      <div class="products-grid" id="productsGrid"></div>
+    </div>
+    
+    <!-- Summary Section -->
+    <div class="summary-section" id="summarySection">
+      <h3 class="summary-title">Order Summary</h3>
+      <div id="categorySummaries">
+        <!-- Category summaries will be inserted here -->
+      </div>
+      <div class="final-total">
+        <span class="final-total-label">Grand Total:</span>
+        <span class="final-total-amount" id="grandTotal">₹0</span>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Store product data and quantities
+    const productData = JSON.parse('{"Almond Milk": [{"Category": "Almond Milk", "Price": "450.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/280943-137 Almond Milk 1Lit.webp", "Product Name": "137 Degrees Almond Milk 1lit", "Weight/Volume": "1l"}], "Baby Foods": [{"Category": "Baby Foods", "Price": "275.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/613795-Untitled design - 2024-05-04T133746.193.webp", "Product Name": "Slurrp Farm Bluberry Pancake Mix 250g", "Weight/Volume": "250g"}, {"Category": "Baby Foods", "Price": "275.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/613795-Untitled design - 2024-05-04T134336.853.webp", "Product Name": "Slurrp Farm Choc Pancake Mix 250g", "Weight/Volume": "250g"}, {"Category": "Baby Foods", "Price": "349.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/878572-951997-SLURRP FARM RAGIAPPLEBANANA 200G.webp", "Product Name": "Slurrp Farm Ragi apple banana 200g", "Weight/Volume": "200g"}, {"Category": "Baby Foods", "Price": "349.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/769236-Untitled design (14).webp", "Product Name": "Slurrp Farm Raw banana 250g", "Weight/Volume": "250g"}, {"Category": "Baby Foods", "Price": "299.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/951997-SLURRP MAGIC MILK MIX VANNILA 250G.webp", "Product Name": "Slurrp Magic Milk Mix Vannila  250g", "Weight/Volume": "250g"}, {"Category": "Baby Foods", "Price": "149.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/693288-Untitled design - 2024-05-04T145532.569.webp", "Product Name": "Slurrpfarm Banana Chocochip Pancake 150g", "Weight/Volume": "150g"}, {"Category": "Baby Foods", "Price": "349.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/693288-Untitled design - 2024-05-04T145639.543.webp", "Product Name": "Slurrpfarm Banana ragi rice With Milk 200", "Weight/Volume": "N/A"}, {"Category": "Baby Foods", "Price": "89.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/613795-Untitled design - 2024-05-04T135518.312.webp", "Product Name": "Slurrpfarm Beetroot Dosamix 150g", "Weight/Volume": "150g"}, {"Category": "Baby Foods", "Price": "299.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/916621-Untitled design - 2024-05-04T151317.595.webp", "Product Name": "Slurrpfarm Berrycrunch Ragistars\u0026moons 400g", "Weight/Volume": "400g"}, {"Category": "Baby Foods", "Price": "199.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/693288-Untitled design - 2024-05-04T150233.962.webp", "Product Name": "Slurrpfarm Blueberry Pancake Mix 150g", "Weight/Volume": "150g"}, {"Category": "Baby Foods", "Price": "200.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/613795-Untitled design - 2024-05-04T135625.494.webp", "Product Name": "Slurrpfarm Chia Seeds 100g", "Weight/Volume": "100g"}, {"Category": "Baby Foods", "Price": "149.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/613795-Untitled design - 2024-05-04T134855.840.webp", "Product Name": "Slurrpfarm Choc Pancake Mix 150g", "Weight/Volume": "150g"}, {"Category": "Baby Foods", "Price": "299.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/951997-SLURRPFARM CHOCCRUNCH RAGISTARS\u0026MOONS 400G.webp", "Product Name": "Slurrpfarm Choccrunch Ragistars\u0026moons 400g", "Weight/Volume": "400g"}, {"Category": "Baby Foods", "Price": "149.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/613795-Untitled design - 2024-05-04T135035.173.webp", "Product Name": "Slurrpfarm Classic Pancakemix 150g", "Weight/Volume": "150g"}, {"Category": "Baby Foods", "Price": "299.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/916621-Untitled design - 2024-05-04T150834.869.webp", "Product Name": "Slurrpfarm Coconutsugar 300g", "Weight/Volume": "300g"}, {"Category": "Baby Foods", "Price": "599.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/693288-Untitled design - 2024-05-04T150400.290.webp", "Product Name": "Slurrpfarm Date Powder 300g", "Weight/Volume": "300g"}, {"Category": "Baby Foods", "Price": "129.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/613795-Untitled design - 2024-05-04T135743.539.webp", "Product Name": "Slurrpfarm Foxtail Millet Noodles 192g", "Weight/Volume": "192g"}, {"Category": "Baby Foods", "Price": "129.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/916621-Untitled design - 2024-05-04T151447.926.webp", "Product Name": "Slurrpfarm Foxtailmillet Vermicelli 180g", "Weight/Volume": "180g"}, {"Category": "Baby Foods", "Price": "129.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/693288-Untitled design - 2024-05-04T150116.269.webp", "Product Name": "Slurrpfarm Health Mix 300g", "Weight/Volume": "300g"}, {"Category": "Baby Foods", "Price": "250.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/613795-Untitled design - 2024-05-04T134526.121.webp", "Product Name": "Slurrpfarm Jaggery Powder 300g", "Weight/Volume": "300g"}, {"Category": "Baby Foods", "Price": "129.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/613795-Untitled design - 2024-05-04T133938.223.webp", "Product Name": "Slurrpfarm Littlemillet Noodle 192g", "Weight/Volume": "192g"}, {"Category": "Baby Foods", "Price": "299.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/724813-SLURRPFARM MAGIC MILK MIX STRAWBERRY BLAST 250G.webp", "Product Name": "Slurrpfarm Magic Milk Mix Strawberry Blast 250g", "Weight/Volume": "250g"}, {"Category": "Baby Foods", "Price": "349.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/693288-Untitled design - 2024-05-04T150550.826.webp", "Product Name": "Slurrpfarm Mango ragi rice With Milk 200g", "Weight/Volume": "200g"}, {"Category": "Baby Foods", "Price": "25.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/613795-Untitled design - 2024-05-04T135938.152.webp", "Product Name": "Slurrpfarm Mightymunch Cheese\u0026herb 20g", "Weight/Volume": "20g"}, {"Category": "Baby Foods", "Price": "25.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/916621-Untitled design - 2024-05-04T151210.665.webp", "Product Name": "Slurrpfarm Mightypuff Chocragi 20g", "Weight/Volume": "20g"}, {"Category": "Baby Foods", "Price": "129.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/613795-Untitled design - 2024-05-04T140244.912.webp", "Product Name": "Slurrpfarm Millet Vermicelli 192g", "Weight/Volume": "192g"}, {"Category": "Baby Foods", "Price": "300.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/693288-Untitled design - 2024-05-04T140649.974.webp", "Product Name": "Slurrpfarm Millet\u0026oat 250g", "Weight/Volume": "250g"}, {"Category": "Baby Foods", "Price": "299.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/613795-Untitled design - 2024-05-04T135409.087.webp", "Product Name": "Slurrpfarm Moongdal Khichdi 200g", "Weight/Volume": "200g"}, {"Category": "Baby Foods", "Price": "299.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/916621-Untitled design - 2024-05-04T151011.950.webp", "Product Name": "Slurrpfarm Multigrain Fusilli 400g", "Weight/Volume": "400g"}, {"Category": "Baby Foods", "Price": "349.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/613795-Untitled design - 2024-05-04T140432.110.webp", "Product Name": "Slurrpfarm Ragi alm banana 250g", "Weight/Volume": "250g"}, {"Category": "Baby Foods", "Price": "349.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/916621-Untitled design - 2024-05-04T151652.944.webp", "Product Name": "Slurrpfarm Sathumaavu 200g", "Weight/Volume": "200g"}, {"Category": "Baby Foods", "Price": "89.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/693288-Untitled design - 2024-05-04T145110.168.webp", "Product Name": "Slurrpfarm Spinach Dosa Mix 150g", "Weight/Volume": "150g"}, {"Category": "Baby Foods", "Price": "300.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/724813-SLURRPFARM SPR RAGI POWDER 250G.webp", "Product Name": "Slurrpfarm Spr Ragi Powder 250g", "Weight/Volume": "250g"}, {"Category": "Baby Foods", "Price": "349.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/613795-Untitled design - 2024-05-04T134141.757.webp", "Product Name": "Slurrpfarm Stw ragi. rice With Milk 200g", "Weight/Volume": "200g"}], "Bakery Products": [{"Category": "Bakery Products", "Price": "150.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/409036-blueberry-cream-cheese-danish-15.webp", "Product Name": "Nutty Cream Cheese Blueberry Danish", "Weight/Volume": "N/A"}, {"Category": "Bakery Products", "Price": "180.00", "Product Image URL": "https://trystgourmet.com/images/subcategoryImages/Strawberry-Tart-09daaa5e292a0d9eb5d02b34284dc0c9.webp", "Product Name": "Strawberry Tart", "Weight/Volume": "N/A"}, {"Category": "Bakery Products", "Price": "220.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/337084-Untitled design (12).webp", "Product Name": "Tryst Apple Cinnamon Cake", "Weight/Volume": "N/A"}, {"Category": "Bakery Products", "Price": "280.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/284212-TRYST BANANA CAKE.webp", "Product Name": "Tryst Banana Cake", "Weight/Volume": "N/A"}, {"Category": "Bakery Products", "Price": "220.00", "Product Image URL": "https://trystgourmet.com/images/subcategoryImages/Banana-Chocolate-Chip-Cake-418316c5a59b860c23920cd97a83d8ea.webp", "Product Name": "Tryst Banana Choco Chip Cake", "Weight/Volume": "N/A"}], "Baking \u0026 Cooking Needs": [{"Category": "Baking \u0026 Cooking Needs", "Price": "495.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/548163-ABBIES PANCAKE SYRUP 710ML.webp", "Product Name": "Abbies Pancake Syrup 710ml", "Weight/Volume": "710ml"}, {"Category": "Baking \u0026 Cooking Needs", "Price": "975.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/135713-Untitled design (14).webp", "Product Name": "Abbies Pure Mapel Syurp 250ml", "Weight/Volume": "250ml"}, {"Category": "Baking \u0026 Cooking Needs", "Price": "360.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/942684-BETTY CROCKER CHOC FUDGE 475G.webp", "Product Name": "Betty Crocker Choc Fudge 475g", "Weight/Volume": "475g"}, {"Category": "Baking \u0026 Cooking Needs", "Price": "390.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/404809-BETTY CROCKER FRENCH VANNILA CAKE MIX 520G.webp", "Product Name": "Betty Crocker French Vannila Cake Mix 520g", "Weight/Volume": "520g"}, {"Category": "Baking \u0026 Cooking Needs", "Price": "285.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/426224-BETTY CROCKER PANCAKE MIX 500G.webp", "Product Name": "Betty Crocker Pancake Mix 500g", "Weight/Volume": "500g"}, {"Category": "Baking \u0026 Cooking Needs", "Price": "390.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/849074-BETTY CROCKER TRIPLE CHOC FLV BROWNIE MIX 425G.webp", "Product Name": "Betty Crocker Triple Choc Flv Brownie Mix 425g", "Weight/Volume": "425g"}, {"Category": "Baking \u0026 Cooking Needs", "Price": "1050.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/459065-COOMBS MAPLE SYRUP 236M.webp", "Product Name": "Coombs Maple Syrup 236m", "Weight/Volume": "N/A"}, {"Category": "Baking \u0026 Cooking Needs", "Price": "170.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/919124-71ovFHu+fTL._AC_UF1000", "Product Name": "Food Strong Choc Banana Pancake Mix 250g", "Weight/Volume": "250g"}, {"Category": "Baking \u0026 Cooking Needs", "Price": "190.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/779921-FOOD STRONG DOUBLE CHOCCHIP PANCAKE MIX 250G.webp", "Product Name": "Food Strong Double Chocchip Pancake Mix 250g", "Weight/Volume": "250g"}, {"Category": "Baking \u0026 Cooking Needs", "Price": "170.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/404809-FOOD STRONG VANILLA BANANA PANCAKE MIX 250G.webp", "Product Name": "Food Strong Vanilla Banana Pancake Mix 250g", "Weight/Volume": "250g"}, {"Category": "Baking \u0026 Cooking Needs", "Price": "495.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/332249-GOODNESS VANILLA PURE EXTRACT 50GM(38ML).webp", "Product Name": "Goodness Vanilla Pure Extract 50gm(38ml)", "Weight/Volume": "50g"}, {"Category": "Baking \u0026 Cooking Needs", "Price": "250.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/916621-Untitled design - 2024-05-04T155836.069.webp", "Product Name": "Habit Breadcrumbs 1kg", "Weight/Volume": "1kg"}, {"Category": "Baking \u0026 Cooking Needs", "Price": "76.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/916621-Untitled design - 2024-05-04T160010.255.webp", "Product Name": "Pillsbury - Multigrain 1 Kg", "Weight/Volume": "1 Kg"}, {"Category": "Baking \u0026 Cooking Needs", "Price": "135.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/916621-Untitled design - 2024-05-04T160801.952.webp", "Product Name": "Pillsbury Cooker Cake Mix Vanilla 159", "Weight/Volume": "N/A"}, {"Category": "Baking \u0026 Cooking Needs", "Price": "48.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/916621-Untitled design - 2024-05-04T160354.233.webp", "Product Name": "Pillsbury Custard Powder 100g", "Weight/Volume": "100g"}, {"Category": "Baking \u0026 Cooking Needs", "Price": "135.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/604708-Untitled design - 2024-05-04T162147.769.webp", "Product Name": "Pillsbury Eggless Cookerchoc Cake 159g", "Weight/Volume": "159g"}, {"Category": "Baking \u0026 Cooking Needs", "Price": "72.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/429921-PILLSBURY GOLD ATTA 1KG.webp", "Product Name": "Pillsbury Gold Atta 1kg", "Weight/Volume": "1kg"}, {"Category": "Baking \u0026 Cooking Needs", "Price": "215.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/604708-Untitled design - 2024-05-04T162025.912.webp", "Product Name": "Pillsbury Rich Choc Oven Cake Mix 285g", "Weight/Volume": "285g"}, {"Category": "Baking \u0026 Cooking Needs", "Price": "215.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/604708-Untitled design - 2024-05-04T162248.474.webp", "Product Name": "Pillsbury Vanilla Ovencake Mix 225g", "Weight/Volume": "225g"}], "Broth (Stock Water)": [{"Category": "Broth (Stock Water)", "Price": "490.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/328765-Untitled design (16).webp", "Product Name": "Sf Basil Pesto", "Weight/Volume": "N/A"}], "Canned Meats": [{"Category": "Canned Meats", "Price": "199.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/942684-ABBIES-TUNA-CHUNKS-IN-SUNFLOWER-OIL 185G.webp", "Product Name": "Abbies Tuna Chunks In Sunflower Oil 185g", "Weight/Volume": "185g"}, {"Category": "Canned Meats", "Price": "325.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/252738-GOLDEN PRIZE - PIN SOLOMON IN OIL SMOKED.webp", "Product Name": "Golden Prize - Pin Solomon In Oil Smoked", "Weight/Volume": "N/A"}, {"Category": "Canned Meats", "Price": "119.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/801892-GOLDEN PRIZE - SADINE IN TOMATO SAUCE - 200GM.webp", "Product Name": "Golden Prize - Sadine In Tomato Sauce - 200gm", "Weight/Volume": "200g"}, {"Category": "Canned Meats", "Price": "205.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/207549-GOLDEN PRIZE - TUNA SALAD VEGITABLES MEXICAN STYLE - 185GM.webp", "Product Name": "Golden Prize - Tuna Salad Vegitables Mexican Style - 185gm", "Weight/Volume": "185g"}, {"Category": "Canned Meats", "Price": "140.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/289094-GOLDEN PRIZE MACKEREL IN OIL 200G.webp", "Product Name": "Golden Prize Mackerel In Oil 200g", "Weight/Volume": "200g"}, {"Category": "Canned Meats", "Price": "179.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/779921-GOLDEN PRIZE PREMIUM OYSTER SAUCE GB.webp", "Product Name": "Golden Prize Premium Oyster Sauce Gb", "Weight/Volume": "N/A"}, {"Category": "Canned Meats", "Price": "79.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/444125-GOLDEN PRIZE SARDINE IN BRINE 125G.webp", "Product Name": "Golden Prize Sardine In Brine 125g", "Weight/Volume": "125g"}, {"Category": "Canned Meats", "Price": "175.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/919124-GOLDEN PRIZE TUNA FLAKES IN OIL WITH RED CHILLI 185G.webp", "Product Name": "Golden Prize Tuna Flakes In Oil With Red Chilli 185g", "Weight/Volume": "185g"}, {"Category": "Canned Meats", "Price": "170.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/821123-GOLDEN PRIZE TUNAFLAKES IN SOYABEAN OIL 185G.webp", "Product Name": "Golden Prize Tunaflakes In Soyabean Oil 185g", "Weight/Volume": "185g"}, {"Category": "Canned Meats", "Price": "140.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/801892-GOLDEN PRIZE-MACKERAL TOM SAUCE \u0026RED CHILLI 200G.webp", "Product Name": "Golden Prize-mackeral Tom Sauce \u0026red Chilli 200g", "Weight/Volume": "200g"}], "Cheese": [{"Category": "Cheese", "Price": "649.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/920841-images (1).webp", "Product Name": "kraft orginal cheese slice 200g", "Weight/Volume": "200g"}, {"Category": "Cheese", "Price": "649.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/733018-download.webp", "Product Name": "kraft light cheese slice 200g", "Weight/Volume": "200g"}], "Chilli Sauce": [], "Chocolates \u0026 Sweets": [{"Category": "Chocolates \u0026 Sweets", "Price": "99.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/812548-Untitled design (21).webp", "Product Name": "Alt Co Orangepeel \u0026 45% Dark Choc 50g", "Weight/Volume": "50g"}, {"Category": "Chocolates \u0026 Sweets", "Price": "99.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/944016-Untitled design (43).webp", "Product Name": "Altco 45% Dark Choc 50g", "Weight/Volume": "50g"}, {"Category": "Chocolates \u0026 Sweets", "Price": "149.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/944016-Layer-9.webp", "Product Name": "Altco 70% Dark Sea Salt 50g", "Weight/Volume": "50g"}, {"Category": "Chocolates \u0026 Sweets", "Price": "99.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/218782-alt almn.webp", "Product Name": "Alt Co Almond \u0026 Cranberry Chocolate - Rich In Taste  50 g", "Weight/Volume": "50 g"}, {"Category": "Chocolates \u0026 Sweets", "Price": "699.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/135713-Untitled design (15).webp", "Product Name": "Barquillo Asst Gift Box 180g", "Weight/Volume": "180g"}, {"Category": "Chocolates \u0026 Sweets", "Price": "1299.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/812548-Untitled design (15).webp", "Product Name": "Barquillo Asst Gift Box 320g", "Weight/Volume": "320g"}, {"Category": "Chocolates \u0026 Sweets", "Price": "299.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/812548-HazelnutPouchFront_c9f87766-4b0f-4654-ac3c-c06a4da74712.webp", "Product Name": "Barquillo Hazelnut 100g", "Weight/Volume": "100g"}, {"Category": "Chocolates \u0026 Sweets", "Price": "599.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/812548-HazelnutPouchFront_c9f87766-4b0f-4654-ac3c-c06a4da74712.webp", "Product Name": "Barquillo Hazelnut 200g", "Weight/Volume": "200g"}, {"Category": "Chocolates \u0026 Sweets", "Price": "349.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/878304-BARQUILLO PISTACHIO 100G.webp", "Product Name": "Barquillo Pistachio 100g", "Weight/Volume": "100g"}, {"Category": "Chocolates \u0026 Sweets", "Price": "349.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/967572-BARQUILLO REDVELVET CHEESECAKE TIN 200G.webp", "Product Name": "Barquillo Redvelvet Cheesecake 100g", "Weight/Volume": "100g"}, {"Category": "Chocolates \u0026 Sweets", "Price": "299.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/942684-BARQUILLO RST ALMOND 100G.webp", "Product Name": "Barquillo Rst Almond 100g", "Weight/Volume": "100g"}, {"Category": "Chocolates \u0026 Sweets", "Price": "225.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/849074-BON-FICTION 55 DC ALPHONSO MANGO AND CHILLI 55G.webp", "Product Name": "Bon-fiction 55 Dc Alphonso Mango And Chilli 55g", "Weight/Volume": "55g"}, {"Category": "Chocolates \u0026 Sweets", "Price": "225.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/489302-Untitled design (21).webp", "Product Name": "Bon-fiction 55% Dc Milk \u0026 Coffe Chocolate 55g", "Weight/Volume": "55g"}, {"Category": "Chocolates \u0026 Sweets", "Price": "225.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/463055-Untitled design23.webp", "Product Name": "Bon-fiction 55% Dc Rs Almond sea Salt\u0026 Watermelon Seeds 55g", "Weight/Volume": "55g"}, {"Category": "Chocolates \u0026 Sweets", "Price": "225.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/463055-Untitled design24.webp", "Product Name": "Bon-fiction 55% Dk Chocolate Pistachio \u0026 Rose 55g", "Weight/Volume": "55g"}, {"Category": "Chocolates \u0026 Sweets", "Price": "225.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/485141-BON-FICTION 64% DC ORANGE PEEL CINNAMON 55G.webp", "Product Name": "Bon-fiction 64% Dc Orange Peel Cinnamon 55g", "Weight/Volume": "55g"}, {"Category": "Chocolates \u0026 Sweets", "Price": "225.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/758843-a75ryrv7f6kshy3n88dgbtxiylth.webp", "Product Name": "Bon-fiction 64% Dc Peanut \u0026 Sea Salt 55g", "Weight/Volume": "55g"}, {"Category": "Chocolates \u0026 Sweets", "Price": "225.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/446344-BON-FICTION 64% DK CHOCOLATE \u0026 PEPPERMINT 55.webp", "Product Name": "Bon-fiction 64% Dk Chocolate \u0026 Peppermint 55g", "Weight/Volume": "55g"}, {"Category": "Chocolates \u0026 Sweets", "Price": "225.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/382773-41ugLJO-S9L._SX300_SY300_QL70_FMwebp_.webp", "Product Name": "Bon-fiction 73% Dk Chocolate 55g", "Weight/Volume": "55g"}, {"Category": "Chocolates \u0026 Sweets", "Price": "400.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/444125-CAMPFIRE MARSHMALLOW 300G.webp", "Product Name": "Campfire Marshmallow  300g", "Weight/Volume": "300g"}, {"Category": "Chocolates \u0026 Sweets", "Price": "195.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/316472-Untitled design (26).webp", "Product Name": "Fox Glacier Fruits 130g", "Weight/Volume": "130g"}, {"Category": "Chocolates \u0026 Sweets", "Price": "120.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/316472-Untitled design (28).webp", "Product Name": "Impact Blueberry 14g", "Weight/Volume": "14g"}, {"Category": "Chocolates \u0026 Sweets", "Price": "120.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/289094-IMPACT MANGO 14G.webp", "Product Name": "Impact Mango 14g", "Weight/Volume": "14g"}, {"Category": "Chocolates \u0026 Sweets", "Price": "120.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/404809-IMPACT MINTS BLACKCURRENT 14G.webp", "Product Name": "Impact Mints Blackcurrent 14g", "Weight/Volume": "14g"}, {"Category": "Chocolates \u0026 Sweets", "Price": "120.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/801892-IMPACT MINTS LYCHEE MINTS 14G.webp", "Product Name": "Impact Mints Lychee Mints 14g", "Weight/Volume": "14g"}, {"Category": "Chocolates \u0026 Sweets", "Price": "120.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/945886-Orange_b38c378d-0e83-4572-ac29-6ce68a266104.webp", "Product Name": "Impact Mints Orange", "Weight/Volume": "N/A"}, {"Category": "Chocolates \u0026 Sweets", "Price": "120.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/878304-Pineapple.webp", "Product Name": "Impact Pineapple", "Weight/Volume": "N/A"}, {"Category": "Chocolates \u0026 Sweets", "Price": "120.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/951997-IMPACT XYLITOL GUM LEMON MINT 30G.webp", "Product Name": "Impact Xylitol Gum Lemon Mint 30g", "Weight/Volume": "30g"}, {"Category": "Chocolates \u0026 Sweets", "Price": "120.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/988215-Untitled design (43).webp", "Product Name": "Impact Xylitol Gum Soda Mint 30g", "Weight/Volume": "30g"}, {"Category": "Chocolates \u0026 Sweets", "Price": "1850.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/459065-LINDT-LINDOR SWISS ASSORTED NAPOLITIANS 700G.webp", "Product Name": "Lindt Assorted Napolitains 350g", "Weight/Volume": "350g"}, {"Category": "Chocolates \u0026 Sweets", "Price": "400.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/951997-LINDT CARAMEL CHOCOLATE 100G.webp", "Product Name": "Lindt Caramel Chocolate 100g", "Weight/Volume": "100g"}, {"Category": "Chocolates \u0026 Sweets", "Price": "400.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/446477-LINDT CARAMELISED HAZELNUT 100G.webp", "Product Name": "Lindt Caramelised Hazelnut 100g", "Weight/Volume": "100g"}, {"Category": "Chocolates \u0026 Sweets", "Price": "150.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/289094-LINDT EXTRA CREAME MILK 35G.webp", "Product Name": "Lindt Extra Creame Milk 35g", "Weight/Volume": "35g"}, {"Category": "Chocolates \u0026 Sweets", "Price": "1000.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/289094-LINDT LINDOR ASSORTED 225G.webp", "Product Name": "Lindt Lindor Assorted 225g", "Weight/Volume": "225g"}, {"Category": "Chocolates \u0026 Sweets", "Price": "3000.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/459065-LINDT-LINDOR SWISS ASSORTED NAPOLITIANS 700G.webp", "Product Name": "Lindt-lindor  Swiss Assorted Napolitians 700g", "Weight/Volume": "700g"}, {"Category": "Chocolates \u0026 Sweets", "Price": "200.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/316472-Untitled design (25).webp", "Product Name": "Misky Assorted Eclairs 500g", "Weight/Volume": "500g"}, {"Category": "Chocolates \u0026 Sweets", "Price": "299.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/624381-MILK-RICH.webp", "Product Name": "Misky Chocolate Eclairs 700g", "Weight/Volume": "700g"}, {"Category": "Chocolates \u0026 Sweets", "Price": "175.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/291597-IMG_1449.webp", "Product Name": "Misky Eclairs Ice Cream Bag 400gm", "Weight/Volume": "400g"}, {"Category": "Chocolates \u0026 Sweets", "Price": "130.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/385767-Untitled design (30).webp", "Product Name": "Muscle Blaze Cookies\u0026cream Protein Bar 62g", "Weight/Volume": "62g"}, {"Category": "Chocolates \u0026 Sweets", "Price": "60.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/385767-Untitled design (30).webp", "Product Name": "Muscle Blaze Energy Bar Choco Orange 10gm", "Weight/Volume": "10g"}, {"Category": "Chocolates \u0026 Sweets", "Price": "75.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/385767-shopping.webp", "Product Name": "Muscle Blaze Protein Bar ( Cookies \u0026 Cream ) 10gm", "Weight/Volume": "10g"}, {"Category": "Chocolates \u0026 Sweets", "Price": "45.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/385767-Untitled design (35).webp", "Product Name": "Muscle Blaze Snackbar Chocalmond 1.50g", "Weight/Volume": "50g"}, {"Category": "Chocolates \u0026 Sweets", "Price": "250.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/801892-NOURISH FIG AMARANTH 120G.webp", "Product Name": "Nourish Fig Amaranth 120g", "Weight/Volume": "120g"}, {"Category": "Chocolates \u0026 Sweets", "Price": "360.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/341519-NOURISH VARIETY BARS PACK 180G.webp", "Product Name": "Nourish Variety Bars Pack 180g", "Weight/Volume": "180g"}, {"Category": "Chocolates \u0026 Sweets", "Price": "449.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/207549-NUTIKO CHOC DATES BISCUIT 300G.webp", "Product Name": "Nutiko Choc Dates Biscuit 300g", "Weight/Volume": "300g"}, {"Category": "Chocolates \u0026 Sweets", "Price": "449.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/340023-NUTIKO CHOC DATES BLONDE 300G.webp", "Product Name": "Nutiko Choc Dates Blonde 300g", "Weight/Volume": "300g"}, {"Category": "Chocolates \u0026 Sweets", "Price": "449.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/821123-NUTIKO CHOC DATES COCONUT 300G.webp", "Product Name": "Nutiko Choc Dates Coconut 300g", "Weight/Volume": "300g"}, {"Category": "Chocolates \u0026 Sweets", "Price": "449.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/188881-NUTIKO RASPBERRY CHOC 300G.webp", "Product Name": "Nutiko Raspberry Choc 300g", "Weight/Volume": "300g"}, {"Category": "Chocolates \u0026 Sweets", "Price": "275.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/731542-51NjfHOLO9L.webp", "Product Name": "Paul And Make  Peppermint Gelato 68g", "Weight/Volume": "68g"}, {"Category": "Chocolates \u0026 Sweets", "Price": "250.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/162072-Untitled design (23).webp", "Product Name": "Paul And Mike Alphonso Mango68g", "Weight/Volume": "68g"}, {"Category": "Chocolates \u0026 Sweets", "Price": "250.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/731542-PAUL AND MIKE AMAZONIAN PINK PEPPER 68G.webp", "Product Name": "Paul And Mike Amazonian Pink Pepper 68g", "Weight/Volume": "68g"}, {"Category": "Chocolates \u0026 Sweets", "Price": "250.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/162072-91i51isnD7S._SL1500_.webp", "Product Name": "Paul And Mike Sitaphal  68g", "Weight/Volume": "68g"}, {"Category": "Chocolates \u0026 Sweets", "Price": "250.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/162072-Untitled design (24).webp", "Product Name": "Paul Mike 64% Vegan Chocolate  68g", "Weight/Volume": "68g"}, {"Category": "Chocolates \u0026 Sweets", "Price": "250.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/332249-PAUL\u0026MIKE BALKEN ROSE 68GM.webp", "Product Name": "Paul\u0026mike Balken Rose 68gm", "Weight/Volume": "68g"}, {"Category": "Chocolates \u0026 Sweets", "Price": "650.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/849074-PAUL\u0026MIKE GIFT BOX6.webp", "Product Name": "Paul\u0026mike Gift Box6", "Weight/Volume": "N/A"}, {"Category": "Chocolates \u0026 Sweets", "Price": "250.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/283542-Untitled design (14).webp", "Product Name": "Paulmike 41% Thandai Chocolate", "Weight/Volume": "N/A"}, {"Category": "Chocolates \u0026 Sweets", "Price": "250.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/283542-Untitled design (15).webp", "Product Name": "Paulmike 57% Lavendar Chocolate", "Weight/Volume": "N/A"}, {"Category": "Chocolates \u0026 Sweets", "Price": "250.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/429921-PAULMIKE 72% DARK CHOCOLATE 68G.webp", "Product Name": "Paulmike 72% Dark Chocolate 68g", "Weight/Volume": "68g"}, {"Category": "Chocolates \u0026 Sweets", "Price": "275.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/429921-PAULMIKE 72% DARK CHOCOLATE 68G.webp", "Product Name": "Paulmike 87% Dark Chocolate 68g", "Weight/Volume": "68g"}, {"Category": "Chocolates \u0026 Sweets", "Price": "250.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/402095-Untitled design (13).webp", "Product Name": "Paulmike Biscoff \u0026 Ginger Braed Spice Mix", "Weight/Volume": "N/A"}, {"Category": "Chocolates \u0026 Sweets", "Price": "250.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/402095-Untitled design (12).webp", "Product Name": "Paulmike Golden Berry 68g", "Weight/Volume": "68g"}, {"Category": "Chocolates \u0026 Sweets", "Price": "275.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/429921-PAULMIKE 72% DARK CHOCOLATE 68G.webp", "Product Name": "Paulmike Italian Piedmont Hazelnuts", "Weight/Volume": "N/A"}, {"Category": "Chocolates \u0026 Sweets", "Price": "250.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/362673-IMG_1456.webp", "Product Name": "Sapphire  Cashew Caramel Crunch", "Weight/Volume": "N/A"}, {"Category": "Chocolates \u0026 Sweets", "Price": "250.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/362673-IMG_1463.webp", "Product Name": "Sapphire  Fantasy  700g", "Weight/Volume": "700g"}, {"Category": "Chocolates \u0026 Sweets", "Price": "700.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/362673-IMG_1481.webp", "Product Name": "Sapphire Almonds 350g", "Weight/Volume": "350g"}, {"Category": "Chocolates \u0026 Sweets", "Price": "150.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/801892-SAPPHIRE BUTTER TOFFEE COCONUT 550G.webp", "Product Name": "Sapphire Butter Toffee  Coconut 550g", "Weight/Volume": "550g"}, {"Category": "Chocolates \u0026 Sweets", "Price": "450.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/362673-IMG_1486.webp", "Product Name": "Sapphire Coated Nuts Almond 200g", "Weight/Volume": "200g"}, {"Category": "Chocolates \u0026 Sweets", "Price": "250.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/109591-IMG_1522.webp", "Product Name": "Sapphire Cranberry Milk Choco Box 90g", "Weight/Volume": "90g"}, {"Category": "Chocolates \u0026 Sweets", "Price": "175.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/320673-IMG_1512.webp", "Product Name": "Sapphire Domes Hazelnut 455g", "Weight/Volume": "455g"}, {"Category": "Chocolates \u0026 Sweets", "Price": "300.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/194950-IMG_1501.webp", "Product Name": "Sapphire Eclairs Choc Flv 800g", "Weight/Volume": "800g"}, {"Category": "Chocolates \u0026 Sweets", "Price": "300.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/819583-SAPPHIRE ECLAIRS HONEY 800G.webp", "Product Name": "Sapphire Eclairs Honey 800g", "Weight/Volume": "800g"}, {"Category": "Chocolates \u0026 Sweets", "Price": "250.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/332249-SAPPHIRE EXCELLENCE 700G.webp", "Product Name": "Sapphire Excellence 700g", "Weight/Volume": "700g"}, {"Category": "Chocolates \u0026 Sweets", "Price": "250.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/819583-SAPPHIRE FRUIT \u0026 NUT 90G.webp", "Product Name": "Sapphire Fruit \u0026 Nut 90g", "Weight/Volume": "90g"}, {"Category": "Chocolates \u0026 Sweets", "Price": "250.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/316472-40269892_1-sapphire-hazelnuts-covered-with-milk-choco.webp", "Product Name": "Sapphire Hazelnut 90g", "Weight/Volume": "90g"}, {"Category": "Chocolates \u0026 Sweets", "Price": "300.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/362673-IMG_1471.webp", "Product Name": "Sapphire Milk 800g", "Weight/Volume": "800g"}, {"Category": "Chocolates \u0026 Sweets", "Price": "175.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/194950-IMG_1504.webp", "Product Name": "Sapphire Opera Orange 420g", "Weight/Volume": "420g"}, {"Category": "Chocolates \u0026 Sweets", "Price": "175.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/316472-Untitled design (29).webp", "Product Name": "Sapphire Truffle Collection Hazelnut 420g", "Weight/Volume": "420g"}, {"Category": "Chocolates \u0026 Sweets", "Price": "599.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/454871-66180a41e7573978362ea4fa-godiva-chocolatier-signature-salted.webp", "Product Name": "GODIVA SALTED CARAMEL MILK CHOCOLATE(8 MINI BARS)", "Weight/Volume": "N/A"}, {"Category": "Chocolates \u0026 Sweets", "Price": "599.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/230837-633aafa2385a6d6232255450-godiva-signature-sea-salt-dark-chocolate.webp", "Product Name": "SEA SALT DARK CHOCOLATE", "Weight/Volume": "N/A"}, {"Category": "Chocolates \u0026 Sweets", "Price": "599.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/725066-Godiva-Milk-Chocolate-Bar-90G-3.webp", "Product Name": "GODIVA MILK CHOCOLATE 90G", "Weight/Volume": "90G"}, {"Category": "Chocolates \u0026 Sweets", "Price": "599.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/159340-images.webp", "Product Name": "GODIVA 72% COCOA DARK CHOCOLATE", "Weight/Volume": "N/A"}, {"Category": "Chocolates \u0026 Sweets", "Price": "599.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/382269-images (1).webp", "Product Name": "GODIVA ROASTED ALMOND\u0026HONEY 90G", "Weight/Volume": "90G"}, {"Category": "Chocolates \u0026 Sweets", "Price": "599.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/951808-971860.webp", "Product Name": "GODIVA SALTED CARAMEL 90G", "Weight/Volume": "90G"}, {"Category": "Chocolates \u0026 Sweets", "Price": "599.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/396307-godiva-belgian-90-dark-chocolate-90g-1.webp", "Product Name": "GODIVA 90% COCOA DARK CHOCOLATE", "Weight/Volume": "N/A"}, {"Category": "Chocolates \u0026 Sweets", "Price": "599.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/398751-07148.webp", "Product Name": "GODIVA SEA SALT 90G", "Weight/Volume": "90G"}, {"Category": "Chocolates \u0026 Sweets", "Price": "599.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/711730-Godiva-Blood-Orange-Dark-Chocolate-90G-1-160x160.webp", "Product Name": "GODIVA BLOOD ORANGE 90G", "Weight/Volume": "90G"}, {"Category": "Chocolates \u0026 Sweets", "Price": "250.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/676883-images (1).webp", "Product Name": "DARKINS ORANGE 63% DARK CHOCOLATE", "Weight/Volume": "N/A"}, {"Category": "Chocolates \u0026 Sweets", "Price": "250.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/822392-darkins-dark-chocolate-65-dark-chocolate-with-coffee-dark-chocolate-bar-vegan-natural-gluten-free-chocolate-50-gm-each-pack-of-3-product-images-orvst32gn9l-p606829822-3-202312211236.webp", "Product Name": "DARKINS COFFEE 65% DARK CHOCOLATE", "Weight/Volume": "N/A"}, {"Category": "Chocolates \u0026 Sweets", "Price": "250.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/566561-images (2).webp", "Product Name": "DARKINS BLUEBERRY 70% DARK CHOCOLATE", "Weight/Volume": "N/A"}, {"Category": "Chocolates \u0026 Sweets", "Price": "250.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/875425-images (3).webp", "Product Name": "DARKINS CRANBERRY CHILLI 70% DARK CHOCOLATE", "Weight/Volume": "N/A"}, {"Category": "Chocolates \u0026 Sweets", "Price": "250.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/587627-Darkins-Mylk-Chocolate-Fruit-Nuts.webp", "Product Name": "DARKINS FRUIT\u0026NUTS MYLK CHOCOLATE", "Weight/Volume": "N/A"}], "Coffee \u0026 Tea": [{"Category": "Coffee \u0026 Tea", "Price": "250.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/620422-BLUE TOKAI EASY POUR 5N.webp", "Product Name": "Blue Tokai Easy Pour 5n", "Weight/Volume": "N/A"}, {"Category": "Coffee \u0026 Tea", "Price": "285.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/779921-bvhb.webp", "Product Name": "Blue Tokai Southindian Filter Blend Coffee 150g", "Weight/Volume": "150g"}, {"Category": "Coffee \u0026 Tea", "Price": "850.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/429921-DAVIDOFF ASIAN COFFEE 100GM.webp", "Product Name": "Davidoff Asian Coffee 100gm", "Weight/Volume": "100g"}, {"Category": "Coffee \u0026 Tea", "Price": "850.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/753913-IMG_1556.webp", "Product Name": "Davidoff Brazil Coffee 10gm", "Weight/Volume": "10g"}, {"Category": "Coffee \u0026 Tea", "Price": "750.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/801892-DAVIDOFF COFFEE RICH 100G.webp", "Product Name": "Davidoff Coffee Rich 100g", "Weight/Volume": "100g"}, {"Category": "Coffee \u0026 Tea", "Price": "650.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/724813-DAVIDOFF CREMA INTENSE 100G.webp", "Product Name": "Davidoff Crema Intense 100g", "Weight/Volume": "100g"}, {"Category": "Coffee \u0026 Tea", "Price": "70.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/758843-Untitled design (36).webp", "Product Name": "Himalaya Green Tea Classic 2g", "Weight/Volume": "2g"}, {"Category": "Coffee \u0026 Tea", "Price": "70.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/332249-61eGIoyXBTL._AC_UF1000", "Product Name": "Himalaya Green Tea Ginger  2g Each", "Weight/Volume": "2g"}, {"Category": "Coffee \u0026 Tea", "Price": "135.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/332249-HIMALAYA GREEN TEA LEMON 2G 20 BAGS.webp", "Product Name": "Himalaya Green Tea Lemon 2g 20 Bags", "Weight/Volume": "2g"}, {"Category": "Coffee \u0026 Tea", "Price": "195.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/143448-Untitled design (59).webp", "Product Name": "Organic India - Tulsi Original -25n", "Weight/Volume": "N/A"}, {"Category": "Coffee \u0026 Tea", "Price": "210.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/762449-Untitled design (80).webp", "Product Name": "Organic India Morninga Hisiscus- 25n", "Weight/Volume": "N/A"}, {"Category": "Coffee \u0026 Tea", "Price": "240.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/143448-Untitled design (63).webp", "Product Name": "Organic India Triphala Power100g", "Weight/Volume": "100g"}, {"Category": "Coffee \u0026 Tea", "Price": "225.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/762449-Untitled design (86).webp", "Product Name": "Organic India Tulasi Detox Kahwa -25n", "Weight/Volume": "N/A"}, {"Category": "Coffee \u0026 Tea", "Price": "215.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/762449-Untitled design (85).webp", "Product Name": "Organic India Tulsi Green Tea Ashwagandha 25n", "Weight/Volume": "N/A"}], "Diwali Gift Hamper": [{"Category": "Diwali Gift Hamper", "Price": "650.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/153085-WhatsApp Image 2024-10-19 at 11.11.47 AM.webp", "Product Name": "BIG GIFT HAMPER 4 IN 1", "Weight/Volume": "N/A"}, {"Category": "Diwali Gift Hamper", "Price": "2600.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/273064-WhatsApp Image 2024-10-19 at 11.11.47 AM (1).webp", "Product Name": "SPECIAL GIFT HAMPER", "Weight/Volume": "N/A"}], "Dressing, Spread \u0026 Dip": [{"Category": "Dressing, Spread \u0026 Dip", "Price": "200.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/801892-REMIA CAESAR DRESSING 250ML.webp", "Product Name": "Remia Caesar  Dressing 250ml", "Weight/Volume": "250ml"}, {"Category": "Dressing, Spread \u0026 Dip", "Price": "325.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/951997-REMIA MAYOLITE 500ML.webp", "Product Name": "Remia Mayolite 500ml", "Weight/Volume": "500ml"}], "Dry Fruits \u0026 Nuts": [{"Category": "Dry Fruits \u0026 Nuts", "Price": "250.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/489302-Untitled design (17).webp", "Product Name": "Bon Amour Tiramisu Hazelnut 100gm", "Weight/Volume": "100g"}, {"Category": "Dry Fruits \u0026 Nuts", "Price": "599.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/848784-Untitled design (60).webp", "Product Name": "Delight Nuts Brazil Nuts 150g", "Weight/Volume": "150g"}, {"Category": "Dry Fruits \u0026 Nuts", "Price": "399.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/769236-Untitled design (16).webp", "Product Name": "Delight Nuts Choc Almonds 200g", "Weight/Volume": "200g"}, {"Category": "Dry Fruits \u0026 Nuts", "Price": "299.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/426224-DELIGHT NUTS CHOC DARK 200G.webp", "Product Name": "Delight Nuts Choc Dark 200g", "Weight/Volume": "200g"}, {"Category": "Dry Fruits \u0026 Nuts", "Price": "299.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/489302-Untitled design (30).webp", "Product Name": "Delight Nuts Choc Milk 200g", "Weight/Volume": "200g"}, {"Category": "Dry Fruits \u0026 Nuts", "Price": "299.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/848784-Untitled design (61).webp", "Product Name": "Delight Nuts Choc White 200g", "Weight/Volume": "200g"}, {"Category": "Dry Fruits \u0026 Nuts", "Price": "540.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/848784-Untitled design (62).webp", "Product Name": "Delight Nuts Dried Blueberries 200g", "Weight/Volume": "200g"}, {"Category": "Dry Fruits \u0026 Nuts", "Price": "290.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/848784-Untitled design (63).webp", "Product Name": "Delight Nuts Dried Cranberries 200g", "Weight/Volume": "200g"}, {"Category": "Dry Fruits \u0026 Nuts", "Price": "399.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/620422-DELIGHT NUTS FITNESS SUPER MIX 200G.webp", "Product Name": "Delight Nuts Fitness Super Mix 200g", "Weight/Volume": "200g"}, {"Category": "Dry Fruits \u0026 Nuts", "Price": "699.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/848784-Untitled design (69).webp", "Product Name": "Delight Nuts Pecan Nuts 150g", "Weight/Volume": "150g"}, {"Category": "Dry Fruits \u0026 Nuts", "Price": "349.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/848784-Untitled design (64).webp", "Product Name": "Delight Nuts Pitted Prunes 200g", "Weight/Volume": "200g"}, {"Category": "Dry Fruits \u0026 Nuts", "Price": "449.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/848784-Untitled design (65).webp", "Product Name": "Delight Nuts R\u0026s Mixed Nuts 200g", "Weight/Volume": "200g"}, {"Category": "Dry Fruits \u0026 Nuts", "Price": "599.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/848784-Untitled design (68).webp", "Product Name": "Delight Nuts Royal Mix 200g", "Weight/Volume": "200g"}, {"Category": "Dry Fruits \u0026 Nuts", "Price": "399.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/848784-Untitled design (59).webp", "Product Name": "Delight R\u0026s Salted Almonds 200g", "Weight/Volume": "200g"}, {"Category": "Dry Fruits \u0026 Nuts", "Price": "249.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/688458-Untitled design (70).webp", "Product Name": "Delightnuts Dried Kiwi 200g", "Weight/Volume": "200g"}, {"Category": "Dry Fruits \u0026 Nuts", "Price": "299.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/848784-Untitled design (66).webp", "Product Name": "Delightnuts Dried Pineapple 200g", "Weight/Volume": "200g"}, {"Category": "Dry Fruits \u0026 Nuts", "Price": "699.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/779921-FLYBERRY WHOLE CRANBERRY 250G.webp", "Product Name": "Flyberry  Whole Cranberry 250g", "Weight/Volume": "250g"}, {"Category": "Dry Fruits \u0026 Nuts", "Price": "999.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/489302-Untitled design (18).webp", "Product Name": "Flyberry - Ajwa Dates - 400gm", "Weight/Volume": "400g"}, {"Category": "Dry Fruits \u0026 Nuts", "Price": "399.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/779921-FLYBERRY - AMERI DATES - 200GM.webp", "Product Name": "Flyberry - Ameri Dates - 200gm", "Weight/Volume": "200g"}, {"Category": "Dry Fruits \u0026 Nuts", "Price": "349.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/988215-Untitled design (55).webp", "Product Name": "Flyberry - Cranberries Whole - 100gm", "Weight/Volume": "100g"}, {"Category": "Dry Fruits \u0026 Nuts", "Price": "399.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/988215-Untitled design (44).webp", "Product Name": "Flyberry - Kalmi Dates ( Try Me @ 249 ) -200g", "Weight/Volume": "200g"}, {"Category": "Dry Fruits \u0026 Nuts", "Price": "369.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/988215-Untitled design (47).webp", "Product Name": "Flyberry - Pomelo 250gm", "Weight/Volume": "250g"}, {"Category": "Dry Fruits \u0026 Nuts", "Price": "599.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/988215-Untitled design (49).webp", "Product Name": "Flyberry Ajwa Dates 200g", "Weight/Volume": "200g"}, {"Category": "Dry Fruits \u0026 Nuts", "Price": "499.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/668810-Untitled design (58).webp", "Product Name": "Flyberry Apricots 200g", "Weight/Volume": "200g"}, {"Category": "Dry Fruits \u0026 Nuts", "Price": "499.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/988215-Untitled design (48).webp", "Product Name": "Flyberry Blackberry 100g", "Weight/Volume": "100g"}, {"Category": "Dry Fruits \u0026 Nuts", "Price": "349.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/988215-Untitled design (52).webp", "Product Name": "Flyberry Blueberries 100g", "Weight/Volume": "100g"}, {"Category": "Dry Fruits \u0026 Nuts", "Price": "699.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/988215-Untitled design (51).webp", "Product Name": "Flyberry Figs 200g", "Weight/Volume": "200g"}, {"Category": "Dry Fruits \u0026 Nuts", "Price": "299.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/988215-Untitled design (56).webp", "Product Name": "Flyberry Kiwi 250g", "Weight/Volume": "250g"}, {"Category": "Dry Fruits \u0026 Nuts", "Price": "499.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/988215-Untitled design (45).webp", "Product Name": "Flyberry Orange 250g", "Weight/Volume": "250g"}, {"Category": "Dry Fruits \u0026 Nuts", "Price": "1999.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/426224-FLYBERRY ORGANIC MEDJOUL DATES 400G.webp", "Product Name": "Flyberry Organic Medjoul Dates 400g", "Weight/Volume": "400g"}, {"Category": "Dry Fruits \u0026 Nuts", "Price": "399.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/988215-Untitled design (46).webp", "Product Name": "Flyberry Papaya Diced 250g", "Weight/Volume": "250g"}, {"Category": "Dry Fruits \u0026 Nuts", "Price": "349.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/988215-Untitled design (50).webp", "Product Name": "Flyberry Pineapple 250g", "Weight/Volume": "250g"}, {"Category": "Dry Fruits \u0026 Nuts", "Price": "369.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/988215-Untitled design (47).webp", "Product Name": "Flyberry Pomelo 250g", "Weight/Volume": "250g"}, {"Category": "Dry Fruits \u0026 Nuts", "Price": "599.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/779921-FLYBERRY WHOLE CRANBERRY 250G.webp", "Product Name": "Flyberry Strawberry 250g", "Weight/Volume": "250g"}, {"Category": "Dry Fruits \u0026 Nuts", "Price": "450.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/919124-NOURISH COCOA CRUNCH GRANOLA 300G.webp", "Product Name": "Nourish Cocoa Crunch Granola 300g", "Weight/Volume": "300g"}, {"Category": "Dry Fruits \u0026 Nuts", "Price": "250.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/919124-NOURISH OMEGA SEEDMIX 150G.webp", "Product Name": "Nourish Omega Seedmix 150g", "Weight/Volume": "150g"}, {"Category": "Dry Fruits \u0026 Nuts", "Price": "310.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/849074-NOURISH ORGANIC HONEY ROASTED CASHEWS 100G.webp", "Product Name": "Nourish Organic Honey Roasted Cashews 100g", "Weight/Volume": "100g"}, {"Category": "Dry Fruits \u0026 Nuts", "Price": "449.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/951997-NUTIKO DARK CHOC 300G.webp", "Product Name": "Nutiko Dark Choc 300g", "Weight/Volume": "300g"}, {"Category": "Dry Fruits \u0026 Nuts", "Price": "380.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/291597-IMG_1447.webp", "Product Name": "Pure Heart - Fiery Hot Cashew - 200gm", "Weight/Volume": "200g"}, {"Category": "Dry Fruits \u0026 Nuts", "Price": "335.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/162072-Untitled design (20).webp", "Product Name": "Pure Heart - Natural Almonds - 200gm", "Weight/Volume": "200g"}, {"Category": "Dry Fruits \u0026 Nuts", "Price": "419.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/162072-81vZba6ynSL._SL1500_.webp", "Product Name": "Pure Heart - Salt \u0026 Sweet Can - 230 Gm", "Weight/Volume": "230 G"}, {"Category": "Dry Fruits \u0026 Nuts", "Price": "435.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/162072-Untitled design (21).webp", "Product Name": "Pure Heart - Salted Pistachios - 180gm", "Weight/Volume": "180g"}, {"Category": "Dry Fruits \u0026 Nuts", "Price": "325.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/162072-Untitled design (19).webp", "Product Name": "Pure Heart Broma Cashew 200gm", "Weight/Volume": "200g"}, {"Category": "Dry Fruits \u0026 Nuts", "Price": "419.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/162072-Untitled design (18).webp", "Product Name": "Pure Heart Lime\u0026spice 230g", "Weight/Volume": "230g"}, {"Category": "Dry Fruits \u0026 Nuts", "Price": "480.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/801892-ROSTAA PISTACHIOS 170G.webp", "Product Name": "Rostaa  Pistachios 170g", "Weight/Volume": "170g"}, {"Category": "Dry Fruits \u0026 Nuts", "Price": "540.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/535427-IMG_1452.webp", "Product Name": "Rostaa Blueberries 150g", "Weight/Volume": "150g"}, {"Category": "Dry Fruits \u0026 Nuts", "Price": "330.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/801892-ROSTAA SLICED CRANBERRIES 200G.webp", "Product Name": "Rostaa Sliced Cranberries 200g", "Weight/Volume": "200g"}], "Edible Oil \u0026 Ghee": [{"Category": "Edible Oil \u0026 Ghee", "Price": "329.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/517800-Untitled design11.webp", "Product Name": "Akshayakalpa  Cow Ghee 200ml", "Weight/Volume": "200ml"}, {"Category": "Edible Oil \u0026 Ghee", "Price": "689.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/967572-AKSHAYAKALPA GHEE 300G.webp", "Product Name": "Akshayakalpa  Ghee 300g", "Weight/Volume": "300g"}, {"Category": "Edible Oil \u0026 Ghee", "Price": "560.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/502502-BEANSTALK COCONUT OIL 1LT.webp", "Product Name": "Beanstalk  Coconut Oil 1lt", "Weight/Volume": "1l"}, {"Category": "Edible Oil \u0026 Ghee", "Price": "500.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/502502-BEANSTALK COCONUT OIL 1LT.webp", "Product Name": "Beanstalk Grountoil 1lt", "Weight/Volume": "1l"}, {"Category": "Edible Oil \u0026 Ghee", "Price": "275.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/919124-BLUE ELEPHANT RICE VINEGAR 200ML.webp", "Product Name": "Blue Elephant Rice Vinegar 200ml", "Weight/Volume": "200ml"}, {"Category": "Edible Oil \u0026 Ghee", "Price": "800.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/489302-Untitled design (25).webp", "Product Name": "Borges Classic Oilve Oil 500ml", "Weight/Volume": "500ml"}, {"Category": "Edible Oil \u0026 Ghee", "Price": "715.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/762449-Untitled design (83).webp", "Product Name": "Organic India Ghee500g", "Weight/Volume": "500g"}, {"Category": "Edible Oil \u0026 Ghee", "Price": "430.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/564320-Untitled design (75).webp", "Product Name": "Organic India Groundnut Oil 1liy", "Weight/Volume": "1l"}, {"Category": "Edible Oil \u0026 Ghee", "Price": "400.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/703030-Untitled design (69).webp", "Product Name": "Organic India Mustard Oil 1lit", "Weight/Volume": "1l"}, {"Category": "Edible Oil \u0026 Ghee", "Price": "425.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/860691-Untitled design (50).webp", "Product Name": "Organic India Sunflower Oil 1lit", "Weight/Volume": "1l"}, {"Category": "Edible Oil \u0026 Ghee", "Price": "725.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/143448-Untitled design (52).webp", "Product Name": "Organic India Virgin Coconut Oil 500ml", "Weight/Volume": "500ml"}], "Frozen Meat": [{"Category": "Frozen Meat", "Price": "190.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/201856-BUFFET SQUID RINGS 250G.webp", "Product Name": "Buffet  Squid Rings 250g", "Weight/Volume": "250g"}, {"Category": "Frozen Meat", "Price": "250.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/201856-BUFFET - CHILLI \u0026 CHEESE CHICKEN SASUAGE - 250GM.webp", "Product Name": "Buffet - Chilli \u0026 Cheese Chicken Sasuage - 250gm", "Weight/Volume": "250g"}, {"Category": "Frozen Meat", "Price": "120.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/252738-BUFFET ATTA PARATHA 400G.webp", "Product Name": "Buffet Atta Paratha 400g", "Weight/Volume": "400g"}, {"Category": "Frozen Meat", "Price": "350.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/404809-BUFFET BREADED FISH FILLET 350G.webp", "Product Name": "Buffet Breaded Fish Fillet 350g", "Weight/Volume": "350g"}, {"Category": "Frozen Meat", "Price": "120.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/459065-165716686728252655162c65c1352851.webp", "Product Name": "Buffet Butter Paratha 300g", "Weight/Volume": "300g"}, {"Category": "Frozen Meat", "Price": "255.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/951997-51qvIveTacL._AC_UF894", "Product Name": "Buffet Chicken Frankfurter 300g", "Weight/Volume": "300g"}, {"Category": "Frozen Meat", "Price": "195.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/821123-BUFFET CHICKEN KEEMA PARATHA 400G.webp", "Product Name": "Buffet Chicken Keema Paratha 400g", "Weight/Volume": "400g"}, {"Category": "Frozen Meat", "Price": "245.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/731542-BUFFET CHICKEN SALAMI 200G.webp", "Product Name": "Buffet Chicken Salami 200g", "Weight/Volume": "200g"}, {"Category": "Frozen Meat", "Price": "550.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/201856-BUFFET CHICKEN SAUSAGE 400G.webp", "Product Name": "Buffet Chicken Sausage 1kg", "Weight/Volume": "1kg"}, {"Category": "Frozen Meat", "Price": "190.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/769236-612X--gnKDL.webp", "Product Name": "Buffet Chicken Sheek Kebab", "Weight/Volume": "N/A"}, {"Category": "Frozen Meat", "Price": "235.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/779921-BUFFET CHILLI CHEESE COCKTAIL SAUSAGE 200G.webp", "Product Name": "Buffet Chilli Cheese Cocktail Sausage 200g", "Weight/Volume": "200g"}, {"Category": "Frozen Meat", "Price": "405.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/801892-1657788358163893532962cfd7c66f1d6.webp", "Product Name": "Buffet Curry Cut With Out Fat 500g", "Weight/Volume": "500g"}, {"Category": "Frozen Meat", "Price": "335.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/731542-BUFFET FISH FILLETS 350G.webp", "Product Name": "Buffet Fish Fillets 350g", "Weight/Volume": "350g"}, {"Category": "Frozen Meat", "Price": "170.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/742192-BUFFET FRENCH FREIS CRINKLE CUT.webp", "Product Name": "Buffet French Freis Crinkle Cut", "Weight/Volume": "N/A"}, {"Category": "Frozen Meat", "Price": "165.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/731542-BUFFET FRENCH FRIES 420G.webp", "Product Name": "Buffet French Fries 420g", "Weight/Volume": "420g"}, {"Category": "Frozen Meat", "Price": "330.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/463055-Untitled design22.webp", "Product Name": "Buffet Large Prawns", "Weight/Volume": "N/A"}, {"Category": "Frozen Meat", "Price": "115.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/821123-BUFFET MALABAR PARATHA 300G.webp", "Product Name": "Buffet Malabar Paratha 300g", "Weight/Volume": "300g"}, {"Category": "Frozen Meat", "Price": "275.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/638143-BUFFET MEDIUM PRAWNS 250G.webp", "Product Name": "Buffet Medium Prawns 250g", "Weight/Volume": "250g"}, {"Category": "Frozen Meat", "Price": "120.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/801892-BUFFET METHI PARATHA 300G.webp", "Product Name": "Buffet Methi Paratha 300g", "Weight/Volume": "300g"}, {"Category": "Frozen Meat", "Price": "120.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/731542-BUFFET MULTIGRAIN PARATHA.webp", "Product Name": "Buffet Multigrain Paratha", "Weight/Volume": "N/A"}, {"Category": "Frozen Meat", "Price": "570.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/821123-BUFFET PORK SALAMI 400G.webp", "Product Name": "Buffet Pork  Salami 400g", "Weight/Volume": "400g"}, {"Category": "Frozen Meat", "Price": "300.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/528033-BUFFET PORK COCKTAIL SAUSAGE 200G.webp", "Product Name": "Buffet Pork Cocktail Sausage 200g", "Weight/Volume": "200g"}, {"Category": "Frozen Meat", "Price": "325.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/528033-BUFFET PORK CURRY CUTS WITH FAT 500G.webp", "Product Name": "Buffet Pork Curry Cuts With Fat 500g", "Weight/Volume": "500g"}, {"Category": "Frozen Meat", "Price": "430.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/709757-Untitled design (71).webp", "Product Name": "Buffet Pork Mince Meat 500g", "Weight/Volume": "500g"}, {"Category": "Frozen Meat", "Price": "270.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/444125-BUFFET PORK SALAMI 200G.webp", "Product Name": "Buffet Pork Salami 200g", "Weight/Volume": "200g"}, {"Category": "Frozen Meat", "Price": "695.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/801892-BUFFET PORK SMOKED HAM 400G.webp", "Product Name": "Buffet Pork Smoked Ham 400g", "Weight/Volume": "400g"}, {"Category": "Frozen Meat", "Price": "310.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/821123-BUFFET PORK STREAKY BACON 150G.webp", "Product Name": "Buffet Pork Streaky Bacon 150g", "Weight/Volume": "150g"}, {"Category": "Frozen Meat", "Price": "240.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/485141-BUFFET SMALL PRAWNS.webp", "Product Name": "Buffet Small Prawns", "Weight/Volume": "N/A"}, {"Category": "Frozen Meat", "Price": "350.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/485141-BUFFET SMOKED CHICKEN HAM 200G.webp", "Product Name": "Buffet Smoked Chicken Ham 200g", "Weight/Volume": "200g"}, {"Category": "Frozen Meat", "Price": "140.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/201856-BUFFET TANDOORI GARLIC NAAN 340G.webp", "Product Name": "Buffet Tandoori Garlic Naan 340g", "Weight/Volume": "340g"}, {"Category": "Frozen Meat", "Price": "120.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/951997-BUFFET TANDOORI NAAN 340G.webp", "Product Name": "Buffet Tandoori Naan 340g", "Weight/Volume": "340g"}, {"Category": "Frozen Meat", "Price": "375.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/485758-LA CARNE PORK CHORIZO SAUSAGES 250G.webp", "Product Name": "La Carne Pork Chorizo Sausages 250g", "Weight/Volume": "250g"}, {"Category": "Frozen Meat", "Price": "275.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/459065-LA CARNE PORK CLASSIC SALAMI 250G.webp", "Product Name": "La Carne Pork Classic Salami 250g", "Weight/Volume": "250g"}, {"Category": "Frozen Meat", "Price": "425.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/332249-LA CARNE PORK PREMIUM BACON 250G.webp", "Product Name": "La Carne Pork Premium Bacon 250g", "Weight/Volume": "250g"}, {"Category": "Frozen Meat", "Price": "440.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/801892-PRASUMA MOMOS PORK 24PCS.webp", "Product Name": "Prasuma Momos Pork 24pcs", "Weight/Volume": "N/A"}, {"Category": "Frozen Meat", "Price": "295.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/916621-Untitled design - 2024-05-04T153106.071.webp", "Product Name": "Tannys Back Bacon 150g", "Weight/Volume": "150g"}, {"Category": "Frozen Meat", "Price": "350.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/916621-Untitled design - 2024-05-04T153445.702.webp", "Product Name": "Tannys Beef Mince 500g", "Weight/Volume": "500g"}, {"Category": "Frozen Meat", "Price": "250.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/916621-Untitled design - 2024-05-04T154016.329.webp", "Product Name": "Tannys Cheese \u0026 Onion Sausages 200g", "Weight/Volume": "200g"}, {"Category": "Frozen Meat", "Price": "245.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/951997-40011536_3-tannys-chicken-ham.webp", "Product Name": "Tannys Chicken Ham 150g", "Weight/Volume": "150g"}, {"Category": "Frozen Meat", "Price": "625.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/916621-Untitled design - 2024-05-04T153214.926.webp", "Product Name": "Tannys Chicken Salami Spicy 500g", "Weight/Volume": "500g"}, {"Category": "Frozen Meat", "Price": "195.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/916621-40011537_3-tannys-chicken-garlic-sausages.webp", "Product Name": "Tannys Garlic Sausauges 250g", "Weight/Volume": "250g"}, {"Category": "Frozen Meat", "Price": "295.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/951997-TANNYS MUGHLAI MUTTON PAYA 300G.webp", "Product Name": "Tannys Mughlai Mutton Paya 300g", "Weight/Volume": "300g"}, {"Category": "Frozen Meat", "Price": "290.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/916621-40011538_3-tannys-streaky-bacon.webp", "Product Name": "Tannys Pork Streaky Bacon 150g", "Weight/Volume": "150g"}, {"Category": "Frozen Meat", "Price": "570.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/916621-Untitled design - 2024-05-04T152248.466.webp", "Product Name": "Tryst Beef Burgerpatti 400g", "Weight/Volume": "400g"}, {"Category": "Frozen Meat", "Price": "1100.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/593226-download.webp", "Product Name": "Tryst Beef Tenderloin Cubes 1kg", "Weight/Volume": "1kg"}, {"Category": "Frozen Meat", "Price": "450.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/593226-veal-cubes-500-gr-veal-products-54-16-B.webp", "Product Name": "Tryst Veal Cubes 500g", "Weight/Volume": "500g"}], "Muesli, Oats \u0026 Cereal": [{"Category": "Muesli, Oats \u0026 Cereal", "Price": "790.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/404809-BOBS RED MILL THICK ROLLED OATS 907G.webp", "Product Name": "Bobs Red Mill Thick  Rolled Oats 907g", "Weight/Volume": "907g"}, {"Category": "Muesli, Oats \u0026 Cereal", "Price": "230.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/444125-MONSOON HARVEST FIG HONEY \u0026 SALTED PISTACHIOS 250G.webp", "Product Name": "Monsoon Harvest Fig Honey \u0026 Salted Pistachios 250g", "Weight/Volume": "250g"}, {"Category": "Muesli, Oats \u0026 Cereal", "Price": "200.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/919124-MONSOON HARVEST GLUTEEN FREE INSTANTS OATS 500G.webp", "Product Name": "Monsoon Harvest Gluteen Free Instants Oats 500g", "Weight/Volume": "500g"}, {"Category": "Muesli, Oats \u0026 Cereal", "Price": "260.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/446344-MONSOON HARVEST RAGI FLAKES WITH BANANA 350G.webp", "Product Name": "Monsoon Harvest Ragi Flakes With  Banana 350g", "Weight/Volume": "350g"}, {"Category": "Muesli, Oats \u0026 Cereal", "Price": "399.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/385767-Untitled design (33).webp", "Product Name": "Muscle Blaze Muesli Drkchoc\u0026cranberry 400g", "Weight/Volume": "400g"}, {"Category": "Muesli, Oats \u0026 Cereal", "Price": "485.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/849074-NOURISH AMARANTH MUESLI 280G.webp", "Product Name": "Nourish Amaranth Muesli 280g", "Weight/Volume": "280g"}, {"Category": "Muesli, Oats \u0026 Cereal", "Price": "350.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/857362-NOURISH HONEY CRUNCH MUESLI 300G.webp", "Product Name": "Nourish Honey Crunch Muesli 300g", "Weight/Volume": "300g"}, {"Category": "Muesli, Oats \u0026 Cereal", "Price": "325.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/434093-Untitled design (94).webp", "Product Name": "Pintola Muesli Choco Berry  Crunch 400gm", "Weight/Volume": "400g"}, {"Category": "Muesli, Oats \u0026 Cereal", "Price": "335.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/849074-PINTOLA MUESLI FUIT \u0026 NUTS 400GM.webp", "Product Name": "Pintola Muesli Fuit \u0026 Nuts  400gm", "Weight/Volume": "400g"}, {"Category": "Muesli, Oats \u0026 Cereal", "Price": "325.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/762449-Untitled design (88).webp", "Product Name": "Pintola Muesli Whole Grain \u0026 Seeds 400gm", "Weight/Volume": "400g"}, {"Category": "Muesli, Oats \u0026 Cereal", "Price": "925.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/954698-s-l1200.webp", "Product Name": "KELLOGGS FROOT LOOPS", "Weight/Volume": "N/A"}], "Nutraceuticals": [{"Category": "Nutraceuticals", "Price": "950.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/731542-FAST\u0026UP ASHWAGANDHA 60N CAPSULES.webp", "Product Name": "Fast\u0026up Ashwagandha 60n Capsules", "Weight/Volume": "N/A"}, {"Category": "Nutraceuticals", "Price": "265.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/724813-FAST\u0026UP BERRY 20T.webp", "Product Name": "Fast\u0026up Berry 20t", "Weight/Volume": "N/A"}, {"Category": "Nutraceuticals", "Price": "390.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/446344-FAST\u0026UP CHARGE 20T.webp", "Product Name": "Fast\u0026up Charge 20t", "Weight/Volume": "N/A"}, {"Category": "Nutraceuticals", "Price": "249.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/821123-FAST\u0026UP FORTIFY ORANGE FLAVOUR 20S.webp", "Product Name": "Fast\u0026up Fortify Orange Flavour 20s", "Weight/Volume": "N/A"}, {"Category": "Nutraceuticals", "Price": "265.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/459065-fast-up-charge-effervescenttablets-orange-flavour-60-s01.webp", "Product Name": "Fast\u0026up H\u0026e Orange", "Weight/Volume": "N/A"}, {"Category": "Nutraceuticals", "Price": "650.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/404809-FAST\u0026UP L-CARNITINE 1000MG.webp", "Product Name": "Fast\u0026up L-carnitine 1000mg", "Weight/Volume": "N/A"}, {"Category": "Nutraceuticals", "Price": "495.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/731542-FAST\u0026UP LIVER DETOX MIXEDBERRY.webp", "Product Name": "Fast\u0026up Liver Detox Mixedberry", "Weight/Volume": "N/A"}, {"Category": "Nutraceuticals", "Price": "410.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/801892-FAST\u0026UP MAGNESIO LIME\u0026LEMON 20T.webp", "Product Name": "Fast\u0026up Magnesio Lime\u0026lemon 20t", "Weight/Volume": "N/A"}, {"Category": "Nutraceuticals", "Price": "460.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/280665-fastup-man-extend-20-effervescent-tablets-cola-flavor-2-1681894111.webp", "Product Name": "Fast\u0026up Man Extend Cola 20t", "Weight/Volume": "N/A"}, {"Category": "Nutraceuticals", "Price": "350.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/446344-FAST\u0026UP NIGHTOUT.webp", "Product Name": "Fast\u0026up Nightout", "Weight/Volume": "N/A"}, {"Category": "Nutraceuticals", "Price": "990.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/252738-FAST\u0026UP PROMEGA OMEGA 3.webp", "Product Name": "Fast\u0026up Promega Omega 3", "Weight/Volume": "N/A"}, {"Category": "Nutraceuticals", "Price": "225.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/446344-Untitled design.webp", "Product Name": "Fast\u0026up Reload O.r.s", "Weight/Volume": "N/A"}, {"Category": "Nutraceuticals", "Price": "220.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/446344-HIMALAYA ASHVAGANDHA GENERAL WELLNESS 60TAB.webp", "Product Name": "Himalaya Ashvagandha General Wellness 60tab", "Weight/Volume": "N/A"}, {"Category": "Nutraceuticals", "Price": "200.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/758843-Untitled design (33).webp", "Product Name": "Himalaya Brahmi Mind Wellness", "Weight/Volume": "N/A"}, {"Category": "Nutraceuticals", "Price": "150.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/801892-HIMALAYA COLD BALM RAPID ACTION EUCALYPTUS.webp", "Product Name": "Himalaya Cold Balm Rapid Action Eucalyptus", "Weight/Volume": "N/A"}, {"Category": "Nutraceuticals", "Price": "9.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/276146-HIMALAYA GASEX FIZZ JALJEERA 5G.webp", "Product Name": "Himalaya Gasex Fizz Jaljeera 5g", "Weight/Volume": "5g"}, {"Category": "Nutraceuticals", "Price": "230.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/758843-Untitled design (35).webp", "Product Name": "Himalaya Gokshura Mens Wellness 60tab", "Weight/Volume": "N/A"}, {"Category": "Nutraceuticals", "Price": "220.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/758843-Untitled design (34).webp", "Product Name": "Himalaya Neem Skin Wellness 60 Tab", "Weight/Volume": "N/A"}, {"Category": "Nutraceuticals", "Price": "4399.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/446344-MUSCLE BLAZE WHEY GOLD PROTEIN POWDER 1KG.webp", "Product Name": "Muscle Blaze Whey Gold Protein Powder 1kg", "Weight/Volume": "1kg"}, {"Category": "Nutraceuticals", "Price": "230.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/703030-Untitled design (70).webp", "Product Name": "Organic India Ashwagandha 60g", "Weight/Volume": "60g"}, {"Category": "Nutraceuticals", "Price": "250.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/143448-Untitled design (62).webp", "Product Name": "Organic India Bowelcare 60cap", "Weight/Volume": "N/A"}, {"Category": "Nutraceuticals", "Price": "230.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/703030-Untitled design (72).webp", "Product Name": "Organic India Brahmi 60g", "Weight/Volume": "60g"}, {"Category": "Nutraceuticals", "Price": "545.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/762449-Untitled design (81).webp", "Product Name": "Organic India Chywanprash 500g", "Weight/Volume": "500g"}, {"Category": "Nutraceuticals", "Price": "495.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/860691-Untitled design (46).webp", "Product Name": "Organic India Flaxseed 60g", "Weight/Volume": "60g"}, {"Category": "Nutraceuticals", "Price": "225.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/332249-ORGANIC INDIA FLEXIBILITYDIGESTION \u0026 COLON CLEANSE60G.webp", "Product Name": "Organic India Flexibilitydigestion \u0026 Colon Cleanse60g", "Weight/Volume": "60g"}, {"Category": "Nutraceuticals", "Price": "250.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/703030-Untitled design (67).webp", "Product Name": "Organic India Immunity 60cap", "Weight/Volume": "N/A"}, {"Category": "Nutraceuticals", "Price": "250.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/385767-Untitled design (43).webp", "Product Name": "Organic India Lipidcare 60cap", "Weight/Volume": "N/A"}, {"Category": "Nutraceuticals", "Price": "250.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/703030-Untitled design (66).webp", "Product Name": "Organic India Liver- Kidney Care60g", "Weight/Volume": "60g"}, {"Category": "Nutraceuticals", "Price": "230.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/385767-Untitled design (45).webp", "Product Name": "Organic India Moringa 60g", "Weight/Volume": "60g"}, {"Category": "Nutraceuticals", "Price": "599.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/703030-Untitled design (65).webp", "Product Name": "Organic India Oh-boy 350mg", "Weight/Volume": "N/A"}, {"Category": "Nutraceuticals", "Price": "225.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/849074-ORGANIC INDIA PROSTATE CARE 60 CAP.webp", "Product Name": "Organic India Prostate Care 60 Cap", "Weight/Volume": "N/A"}, {"Category": "Nutraceuticals", "Price": "210.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/143448-Untitled design (51).webp", "Product Name": "Organic India Psyllium 100g", "Weight/Volume": "100g"}, {"Category": "Nutraceuticals", "Price": "97.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/143448-Untitled design (57).webp", "Product Name": "Organic India Simply Chamomile - 25n", "Weight/Volume": "N/A"}, {"Category": "Nutraceuticals", "Price": "105.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/143448-Untitled design (54).webp", "Product Name": "Organic India Stevia 25g", "Weight/Volume": "25g"}, {"Category": "Nutraceuticals", "Price": "250.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/860691-Untitled design (49).webp", "Product Name": "Organic India Sugar Balance60g", "Weight/Volume": "60g"}, {"Category": "Nutraceuticals", "Price": "325.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/849074-ORGANIC INDIA TURMERIC FORMULA60G.webp", "Product Name": "Organic India Turmeric Formula60g", "Weight/Volume": "60g"}, {"Category": "Nutraceuticals", "Price": "425.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/860691-Untitled design (47).webp", "Product Name": "Organic India Wheat Grass Powder100g", "Weight/Volume": "100g"}, {"Category": "Nutraceuticals", "Price": "2200.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/188881-ORIGIN VEGAN PROTEIN CHOCOLATE FLV 271G.webp", "Product Name": "Origin Choc 770g", "Weight/Volume": "770g"}, {"Category": "Nutraceuticals", "Price": "2200.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/823110-Untitled design - 2024-05-04T122619.018.webp", "Product Name": "Origin Cofee Caramel 770g", "Weight/Volume": "770g"}, {"Category": "Nutraceuticals", "Price": "2200.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/823110-Untitled design - 2024-05-04T124311.436.webp", "Product Name": "Origin Strawberry Pouch 770g", "Weight/Volume": "770g"}, {"Category": "Nutraceuticals", "Price": "699.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/823110-Untitled design - 2024-05-04T123018.320.webp", "Product Name": "Origin Supergreens 120g", "Weight/Volume": "120g"}, {"Category": "Nutraceuticals", "Price": "2400.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/823110-Untitled design - 2024-05-04T124517.223.webp", "Product Name": "Origin Unflav Pouch 770g", "Weight/Volume": "770g"}, {"Category": "Nutraceuticals", "Price": "2200.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/823110-Untitled design - 2024-05-04T125743.980.webp", "Product Name": "Origin Vannila Pouch 780g", "Weight/Volume": "780g"}, {"Category": "Nutraceuticals", "Price": "875.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/823110-Untitled design - 2024-05-04T124640.605.webp", "Product Name": "Origin Vegan Coffee Caramel 274g", "Weight/Volume": "274g"}], "Pasta \u0026 Noodles": [{"Category": "Pasta \u0026 Noodles", "Price": "299.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/485141-AGNESI CHIFFERI PASTA 500G.webp", "Product Name": "Agnesi  Chifferi Pasta 500g", "Weight/Volume": "500g"}, {"Category": "Pasta \u0026 Noodles", "Price": "325.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/489302-Untitled design (28).webp", "Product Name": "Agnesi Farfalle Pasta 500g", "Weight/Volume": "500g"}, {"Category": "Pasta \u0026 Noodles", "Price": "325.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/548163-AGNESI LASAGNE PASTA 500G.webp", "Product Name": "Agnesi Lasagne Pasta 500g", "Weight/Volume": "500g"}, {"Category": "Pasta \u0026 Noodles", "Price": "299.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/548163-AGNESI PENNE PASTA 500G.webp", "Product Name": "Agnesi Penne Pasta 500g", "Weight/Volume": "500g"}, {"Category": "Pasta \u0026 Noodles", "Price": "299.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/548163-AGNESI SPAGHETTI PASTA 500G.webp", "Product Name": "Agnesi Spaghetti Pasta 500g", "Weight/Volume": "500g"}, {"Category": "Pasta \u0026 Noodles", "Price": "375.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/365176-AGNESI TAGLIATELLE MEZZANE 500G.webp", "Product Name": "Agnesi Tagliatelle Mezzane 500g", "Weight/Volume": "500g"}, {"Category": "Pasta \u0026 Noodles", "Price": "325.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/548163-AGNESI PENNE PASTA 500G.webp", "Product Name": "Agnesi Whole Wheat Penne 500g", "Weight/Volume": "500g"}, {"Category": "Pasta \u0026 Noodles", "Price": "325.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/540035-100424588_1-blue-dragon-noodles-medium-egg.webp", "Product Name": "Blue Dragon - Fine Egg Noodles 300g", "Weight/Volume": "300g"}, {"Category": "Pasta \u0026 Noodles", "Price": "425.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/459065-BLUE DRAGON - PAD THAI NOODLE KIT - 265 GM.webp", "Product Name": "Blue Dragon - Pad Thai Noodle Kit - 265 Gm", "Weight/Volume": "265 G"}, {"Category": "Pasta \u0026 Noodles", "Price": "375.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/426224-BLUE DRAGON - VIETNAMESE PHO NOODLE KIT.webp", "Product Name": "Blue Dragon - Vietnamese Pho Noodle Kit", "Weight/Volume": "N/A"}, {"Category": "Pasta \u0026 Noodles", "Price": "300.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/758843-9443153-1688639956899..webp", "Product Name": "Blue Dragon - Wholewheat Noodles 300gm", "Weight/Volume": "300g"}, {"Category": "Pasta \u0026 Noodles", "Price": "400.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/489302-Untitled design (20).webp", "Product Name": "Blue Dragon Pad Thai Rice Noodles 300g", "Weight/Volume": "300g"}, {"Category": "Pasta \u0026 Noodles", "Price": "109.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/436386-BLUE DRAGON SWEET CHILLI CUP NOODLES.webp", "Product Name": "Blue Dragon Sweet Chilli Cup  Noodles", "Weight/Volume": "N/A"}, {"Category": "Pasta \u0026 Noodles", "Price": "109.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/338840-BLUE DRAGON TOMYUM CUP NOODLES.webp", "Product Name": "Blue Dragon Tomyum Cup Noodles", "Weight/Volume": "N/A"}, {"Category": "Pasta \u0026 Noodles", "Price": "199.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/864833-BORGES FARFALLE PASTA 500G 2.webp", "Product Name": "Borges Farfalle Pasta 500g", "Weight/Volume": "500g"}, {"Category": "Pasta \u0026 Noodles", "Price": "189.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/942684-BORGES-FUSSILI-PASTA-500G.webp", "Product Name": "Borges Fussili Pasta 500g", "Weight/Volume": "500g"}, {"Category": "Pasta \u0026 Noodles", "Price": "199.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/289094-BORGES LINGUINE 500G.webp", "Product Name": "Borges Linguine 500g", "Weight/Volume": "500g"}, {"Category": "Pasta \u0026 Noodles", "Price": "80.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/878304-BORGES MACARONI 350G.webp", "Product Name": "Borges Macaroni 350g", "Weight/Volume": "350g"}, {"Category": "Pasta \u0026 Noodles", "Price": "80.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/436386-BORGES MINI PENNE PASTA 350G 2.webp", "Product Name": "Borges Mini Penne Pasta 350g", "Weight/Volume": "350g"}, {"Category": "Pasta \u0026 Noodles", "Price": "174.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/758843-borges-tricolor-fusilli-pasta-500-g-product-images-o491484819-p590087509-0-202203150246.webp", "Product Name": "Borges Tricolour Fusilli Pasta 500g", "Weight/Volume": "500g"}, {"Category": "Pasta \u0026 Noodles", "Price": "219.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/878304-BORGES WH WHEAT PENNE RIGATE 500G.webp", "Product Name": "Borges Wh Wheat  Penne Rigate 500g", "Weight/Volume": "500g"}, {"Category": "Pasta \u0026 Noodles", "Price": "219.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/942684-BORGES-FUSSILI-PASTA-500G.webp", "Product Name": "Borges Wh Wheat Fusilli Pasta 500g", "Weight/Volume": "500g"}, {"Category": "Pasta \u0026 Noodles", "Price": "350.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/801892-GAROFALO BUCATINI 500G.webp", "Product Name": "Garofalo Bucatini 500g", "Weight/Volume": "500g"}, {"Category": "Pasta \u0026 Noodles", "Price": "650.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/276146-GAROFALO COUS COUS 1KG.webp", "Product Name": "Garofalo Cous Cous 1kg", "Weight/Volume": "1kg"}, {"Category": "Pasta \u0026 Noodles", "Price": "350.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/945886-GAROFALO FUSSILI 500G.webp", "Product Name": "Garofalo Fussili 500g", "Weight/Volume": "500g"}, {"Category": "Pasta \u0026 Noodles", "Price": "650.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/731542-GAROFALO GLUTENFREE PENNE 400G.webp", "Product Name": "Garofalo Glutenfree Penne 400g", "Weight/Volume": "400g"}, {"Category": "Pasta \u0026 Noodles", "Price": "450.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/945886-GAROFALO GNOCCHI DI PATATE 500G 2.webp", "Product Name": "Garofalo Gnocchi Di Patate 500g", "Weight/Volume": "500g"}, {"Category": "Pasta \u0026 Noodles", "Price": "550.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/446477-GAROFALO LASAGNA 500G.webp", "Product Name": "Garofalo Lasagna 500g", "Weight/Volume": "500g"}, {"Category": "Pasta \u0026 Noodles", "Price": "350.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/332249-GAROFALO LINGUINE 500G.webp", "Product Name": "Garofalo Linguine 500g", "Weight/Volume": "500g"}, {"Category": "Pasta \u0026 Noodles", "Price": "450.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/446344-GAROFALO W.W FUSILLI 500G.webp", "Product Name": "Garofalo W.w Fusilli 500g", "Weight/Volume": "500g"}, {"Category": "Pasta \u0026 Noodles", "Price": "149.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/878304-NONGSHIM BOWLNOODL HOT\u0026SPICY 100G 2.webp", "Product Name": "Nongshim Bowlnoodl Hot\u0026spicy 100g", "Weight/Volume": "100g"}, {"Category": "Pasta \u0026 Noodles", "Price": "149.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/276146-NONGSHIM BOWLNOODL KIMCHI 112G.webp", "Product Name": "Nongshim Bowlnoodl Kimchi 112g", "Weight/Volume": "112g"}, {"Category": "Pasta \u0026 Noodles", "Price": "129.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/821123-NONGSHIM RED SPICY NOODLES 68G.webp", "Product Name": "Nongshim Red Spicy Noodles 68g", "Weight/Volume": "68g"}, {"Category": "Pasta \u0026 Noodles", "Price": "129.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/849074-NONGSHIM VEGGIES CUP NOODELS.webp", "Product Name": "Nongshim Veggies Cup Noodels", "Weight/Volume": "N/A"}, {"Category": "Pasta \u0026 Noodles", "Price": "165.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/446344-NONGSHIN KIMCHI SHIN NOODLE SOUP 112G.webp", "Product Name": "Nongshin  Kimchi Shin Noodle Soup 112g", "Weight/Volume": "112g"}, {"Category": "Pasta \u0026 Noodles", "Price": "175.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/446344-NONGSHIN ANGRY CHAPAGURI 114G.webp", "Product Name": "Nongshin Angry Chapaguri 114g", "Weight/Volume": "114g"}, {"Category": "Pasta \u0026 Noodles", "Price": "295.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/801892-REAL THAI BROWN RICE VERMICELLI 375G.webp", "Product Name": "Real Thai Brown Rice Vermicelli 375g", "Weight/Volume": "375g"}, {"Category": "Pasta \u0026 Noodles", "Price": "250.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/341519-REAL THAI PADTHAI NOODLES 10MM 375G.webp", "Product Name": "Real Thai Padthai Noodles 10mm 375g", "Weight/Volume": "375g"}, {"Category": "Pasta \u0026 Noodles", "Price": "650.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/332249-SAMYANG 2XSPICY 700G 5PACKS.webp", "Product Name": "Samyang 2xspicy 700g 5packs", "Weight/Volume": "700g"}, {"Category": "Pasta \u0026 Noodles", "Price": "150.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/823110-Untitled design - 2024-05-04T122207.193.webp", "Product Name": "Samyang 3x Spicy Hot Chicken", "Weight/Volume": "N/A"}, {"Category": "Pasta \u0026 Noodles", "Price": "75.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/724813-SAMYANG BEANSPROUTS KIMCHI NOODLES 115G.webp", "Product Name": "Samyang Beansprouts Kimchi Noodles 115g", "Weight/Volume": "115g"}, {"Category": "Pasta \u0026 Noodles", "Price": "190.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/823110-Untitled design - 2024-05-04T122054.935.webp", "Product Name": "Samyang Carbo Hotchicken Ramen 105g", "Weight/Volume": "105g"}, {"Category": "Pasta \u0026 Noodles", "Price": "135.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/332249-SAMYANG CHEESE 70G.webp", "Product Name": "Samyang Cheese 70g", "Weight/Volume": "70g"}, {"Category": "Pasta \u0026 Noodles", "Price": "150.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/843457-SAMYANG HABANERO LIME 135G.webp", "Product Name": "Samyang Habanero Lime 135g", "Weight/Volume": "135g"}, {"Category": "Pasta \u0026 Noodles", "Price": "180.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/951997-SAMYANG HOT CHICKEN 105G.webp", "Product Name": "Samyang Hot Chicken 105g", "Weight/Volume": "105g"}, {"Category": "Pasta \u0026 Noodles", "Price": "700.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/958659-IMG_1538.webp", "Product Name": "Samyang Hotpepper Jjajang Ramen 680g", "Weight/Volume": "680g"}, {"Category": "Pasta \u0026 Noodles", "Price": "150.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/801892-SAMYANG JIJAJANG HOT CHICKEN FLAVOUR RAMEN.webp", "Product Name": "Samyang Jijajang Hot Chicken Flavour Ramen", "Weight/Volume": "N/A"}, {"Category": "Pasta \u0026 Noodles", "Price": "675.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/332249-SAMYANG JJAJANGHOT CHICKEN 700G.webp", "Product Name": "Samyang Jjajanghot Chicken 700g", "Weight/Volume": "700g"}], "Personal Care \u0026 Hygiene": [{"Category": "Personal Care \u0026 Hygiene", "Price": "199.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/332249-AXE BRAND 10ML.webp", "Product Name": "Axe Brand 10ml", "Weight/Volume": "10ml"}, {"Category": "Personal Care \u0026 Hygiene", "Price": "595.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/463055-Untitled design20.webp", "Product Name": "Axe Brand Universal Oil 56ml", "Weight/Volume": "56ml"}, {"Category": "Personal Care \u0026 Hygiene", "Price": "50.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/489302-Untitled design (29).webp", "Product Name": "Himalaya Antiseptic Cream 20g", "Weight/Volume": "20g"}, {"Category": "Personal Care \u0026 Hygiene", "Price": "675.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/724813-SEBA MED HAIR CARE COLOR SHAMPOO.webp", "Product Name": "Seba Med Hair Care Color Shampoo", "Weight/Volume": "N/A"}, {"Category": "Personal Care \u0026 Hygiene", "Price": "1390.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/951997-SEBAMED - BABY MULTI PROTECT SUN LOTION 200 ML.webp", "Product Name": "Sebamed - Baby Multi Protect Sun Lotion 200 Ml", "Weight/Volume": "200 Ml"}, {"Category": "Personal Care \u0026 Hygiene", "Price": "300.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/724813-SEBAMED BABY PANTHENOL CLEANSING BAR 100G.webp", "Product Name": "Sebamed Baby Panthenol Cleansing Bar 100g", "Weight/Volume": "100g"}, {"Category": "Personal Care \u0026 Hygiene", "Price": "700.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/724813-SEBAMED BABY POWDER 200G.webp", "Product Name": "Sebamed Baby Powder 200g", "Weight/Volume": "200g"}, {"Category": "Personal Care \u0026 Hygiene", "Price": "970.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/724813-SEBAMED REVITALIZING SHAMPOO -200ML.webp", "Product Name": "Sebamed Revitalizing Shampoo -200ml", "Weight/Volume": "200ml"}], "Snacks \u0026 Chips": [{"Category": "Snacks \u0026 Chips", "Price": "150.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/489302-BR-Ghost.webp", "Product Name": "Fabeato Beetroot Ghost Jolokia Chips 60g", "Weight/Volume": "60g"}, {"Category": "Snacks \u0026 Chips", "Price": "150.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/620422-FABEATO BEETROOT NIMBHU PUDHINA CHIPS 60G.webp", "Product Name": "Fabeato Beetroot Nimbhu Pudhina Chips 60g", "Weight/Volume": "60g"}, {"Category": "Snacks \u0026 Chips", "Price": "150.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/849074-FABEATO JACKFRUIT CHIPS 60G.webp", "Product Name": "Fabeato Jackfruit Chips 60g", "Weight/Volume": "60g"}, {"Category": "Snacks \u0026 Chips", "Price": "150.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/289094-FABEATO OKRA PERI PERI BITES 45G.webp", "Product Name": "Fabeato Okra Peri Peri Bites 45g", "Weight/Volume": "45g"}, {"Category": "Snacks \u0026 Chips", "Price": "150.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/426224-FABEATO SWEET POTATO SWEET\u0026SMOKEY BBQ 90G.webp", "Product Name": "Fabeato Sweei Potato Mexican Cheese Chips 90g", "Weight/Volume": "90g"}, {"Category": "Snacks \u0026 Chips", "Price": "150.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/426224-FABEATO SWEET POTATO SWEET\u0026SMOKEY BBQ 90G.webp", "Product Name": "Fabeato Sweet Potato Sweet\u0026smokey Bbq 90g", "Weight/Volume": "90g"}, {"Category": "Snacks \u0026 Chips", "Price": "99.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/988215-51MsjoxpplL.webp", "Product Name": "Flyberry Spiced Okra  Chips 25g", "Weight/Volume": "25g"}, {"Category": "Snacks \u0026 Chips", "Price": "99.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/988215-Untitled design (57).webp", "Product Name": "Flyberry Spiced Taro Chips 40g", "Weight/Volume": "40g"}, {"Category": "Snacks \u0026 Chips", "Price": "60.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/340023-MAKHANA - CHEESY MINT -30GM.webp", "Product Name": "Makhana - Cheesy Mint -30gm", "Weight/Volume": "30g"}, {"Category": "Snacks \u0026 Chips", "Price": "90.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/821123-40129771_3-makino-nacho-chips-cheese.webp", "Product Name": "Makino  Nacho Cheese 150g", "Weight/Volume": "150g"}, {"Category": "Snacks \u0026 Chips", "Price": "120.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/444125-MAKINO NACHO JALAPENO 150G.webp", "Product Name": "Makino Jalapeno 100g", "Weight/Volume": "100g"}, {"Category": "Snacks \u0026 Chips", "Price": "120.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/821123-40129771_3-makino-nacho-chips-cheese.webp", "Product Name": "Makino Nacho Cheese 107g", "Weight/Volume": "107g"}, {"Category": "Snacks \u0026 Chips", "Price": "90.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/444125-MAKINO NACHO JALAPENO 150G.webp", "Product Name": "Makino Nacho Jalapeno 150g", "Weight/Volume": "150g"}, {"Category": "Snacks \u0026 Chips", "Price": "120.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/332249-MAKINO SWEET CHILLI 100G.webp", "Product Name": "Makino Sweet  Chilli 100g", "Weight/Volume": "100g"}, {"Category": "Snacks \u0026 Chips", "Price": "90.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/188118-MARETTI BRUSCHETTE TOMATO 70G.webp", "Product Name": "Maretti Bruschette Tomato 70g", "Weight/Volume": "70g"}, {"Category": "Snacks \u0026 Chips", "Price": "240.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/341519-MIAOW CHEESE FLV RINGS TIN.webp", "Product Name": "Miaow Cheese Flv Rings Tin", "Weight/Volume": "N/A"}, {"Category": "Snacks \u0026 Chips", "Price": "85.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/289094-MIOW MIOW CHEESE FLV RINGS 60G.webp", "Product Name": "Miow Miow Cheese Flv Rings 60g", "Weight/Volume": "60g"}, {"Category": "Snacks \u0026 Chips", "Price": "99.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/485758-MOJO POPS PROTEIN PUDINA CHUTNEY 30G.webp", "Product Name": "Mojo Pops Protein Pudina Chutney 30g", "Weight/Volume": "30g"}, {"Category": "Snacks \u0026 Chips", "Price": "99.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/919124-MOJO POPS PROTEIN SOURCREAM\u0026ONION 30G.webp", "Product Name": "Mojo Pops Protein Sourcream\u0026onion 30g", "Weight/Volume": "30g"}, {"Category": "Snacks \u0026 Chips", "Price": "99.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/821123-MOJO POPS PROTEIN TANGY TOMATO 30G.webp", "Product Name": "Mojo Pops Protein Tangy Tomato 30g", "Weight/Volume": "30g"}, {"Category": "Snacks \u0026 Chips", "Price": "85.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/276146-NOURISH SPICY MINT 60G.webp", "Product Name": "Nourish Spicy Mint 60g", "Weight/Volume": "60g"}, {"Category": "Snacks \u0026 Chips", "Price": "80.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/951997-TONG GARDEN CASHEW SALTED 40G.webp", "Product Name": "Tong Garden Cashew Salted 40g", "Weight/Volume": "40g"}, {"Category": "Snacks \u0026 Chips", "Price": "170.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/769236-71cFAAOXoTL._SL1500_.webp", "Product Name": "Vandys Raw Makhana 100g", "Weight/Volume": "100g"}, {"Category": "Snacks \u0026 Chips", "Price": "400.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/769236-RawMakhana250gms.webp", "Product Name": "Vandys Raw Makhana 250g", "Weight/Volume": "250g"}], "Staples": [{"Category": "Staples", "Price": "349.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/928335-FLYBERRY-ALMOND-FLOUR 150G.webp", "Product Name": "Flyberry Almond Flour 150g", "Weight/Volume": "150g"}, {"Category": "Staples", "Price": "97.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/143448-Untitled design (55).webp", "Product Name": "Organic India Jaggery Powder 500g", "Weight/Volume": "500g"}, {"Category": "Staples", "Price": "150.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/849074-ORGANIC INDIA PINK SALT 1KG.webp", "Product Name": "Organic India Pink Salt 1kg", "Weight/Volume": "1kg"}, {"Category": "Staples", "Price": "295.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/143448-Untitled design (60).webp", "Product Name": "Organic India Quinoa 500g", "Weight/Volume": "500g"}, {"Category": "Staples", "Price": "389.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/951997-QIDHAN - BLACK RICE FLAKES 300GM.webp", "Product Name": "Qidhan - Black Rice Flakes 300gm", "Weight/Volume": "300g"}, {"Category": "Staples", "Price": "389.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/731542-QIDHAN - RAKTHASHALI RICE FLAKES - 300GMS.webp", "Product Name": "Qidhan - Rakthashali Rice Flakes - 300gms", "Weight/Volume": "300g"}, {"Category": "Staples", "Price": "585.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/857362-QIDHAN CHENKAZHAMA RICE 1KG.webp", "Product Name": "Qidhan Chenkazhama Rice 1kg", "Weight/Volume": "1kg"}, {"Category": "Staples", "Price": "385.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/951997-QIDHAN JYOTHI RICE 1KG.webp", "Product Name": "Qidhan Jyothi Rice 1kg", "Weight/Volume": "1kg"}, {"Category": "Staples", "Price": "275.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/801892-QIDHAN MAPILLAI SAMBA RICE 1KG.webp", "Product Name": "Qidhan Mapillai Samba Rice 1kg", "Weight/Volume": "1kg"}, {"Category": "Staples", "Price": "785.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/769236-Untitled design (15).webp", "Product Name": "Qidhan Navara Raw Rice 1kg", "Weight/Volume": "1kg"}, {"Category": "Staples", "Price": "349.00", "Product Image URL": "https://store.bechofy.in/images/tryst_com_usr/ProductImages/801892-QIDHAN WHITE BASMATI 1KG.webp", "Product Name": "Qidhan White Basmati 1kg", "Weight/Volume": "1kg"}]}');
+    const quantities = {};
+    const categoryTotals = {};
+    let currentCategory = '';
+    
+    // Initialize quantities and totals
+    function initializeQuantities() {
+      for (const category in productData) {
+        quantities[category] = {};
+        categoryTotals[category] = 0;
+        
+        productData[category].forEach(product => {
+          quantities[category][product['Product Name']] = 0;
+        });
+      }
+    }
+    
+    // Show products for a category
+    function showProducts(category) {
+      currentCategory = category;
+      const categoriesView = document.getElementById('categoriesView');
+      const productsView = document.getElementById('productsView');
+      const categoryTitle = document.getElementById('categoryTitle');
+      const productsGrid = document.getElementById('productsGrid');
+      const bulkQuantitySelector = document.getElementById('bulkQuantitySelector');
+      
+      // Set category title
+      categoryTitle.textContent = category;
+      
+      // Show bulk quantity selector
+      bulkQuantitySelector.style.display = 'flex';
+      
+      // Clear previous products
+      productsGrid.innerHTML = '';
+      
+      // Add products to grid
+      const products = productData[category];
+      
+      products.forEach((product, index) => {
+        const productCard = document.createElement('div');
+        productCard.className = 'product-card';
+        
+        // Clean price by removing any existing ₹ symbol
+        const cleanPrice = product['Price'].replace(/₹/g, '').trim();
+        const price = parseFloat(cleanPrice);
+        const productId = `${category.replace(/ /g, '-')}-${index}`;
+        
+        productCard.innerHTML = `
+          <img src="${product['Product Image URL']}" alt="${product['Product Name']}" class="product-image">
+          <div class="product-info">
+            <div class="product-name">${product['Product Name']}</div>
+            <div class="product-price" id="price-${productId}">${price.toFixed(2)}</div>
+            <div class="product-weight">${product['Weight/Volume']}</div>
+            <div class="quantity-selector">
+              <button class="quantity-btn minus" data-id="${productId}" data-price="${price}">-</button>
+              <input type="number" min="0" value="${quantities[category][product['Product Name']]}" class="quantity-input" id="quantity-${productId}">
+              <button class="quantity-btn plus" data-id="${productId}" data-price="${price}">+</button>
+            </div>
+          </div>
+        `;
+        
+        productsGrid.appendChild(productCard);
+        
+        // Add event listeners to quantity buttons
+        productCard.querySelector('.minus').addEventListener('click', (e) => {
+          updateQuantity(e.target.dataset.id, -1, parseFloat(e.target.dataset.price));
+        });
+        
+        productCard.querySelector('.plus').addEventListener('click', (e) => {
+          updateQuantity(e.target.dataset.id, 1, parseFloat(e.target.dataset.price));
+        });
+        
+        productCard.querySelector('.quantity-input').addEventListener('change', (e) => {
+          const newQuantity = parseInt(e.target.value) || 0;
+          const productId = e.target.id.replace('quantity-', '');
+          const price = parseFloat(document.getElementById(`price-${productId}`).textContent.replace(/₹/g, ''));
+          setQuantity(productId, newQuantity, price);
+        });
+        
+        // Add click event to show enhanced modal
+        productCard.addEventListener('click', (e) => {
+          // Don't open modal if clicking on quantity controls
+          if (!e.target.closest('.quantity-selector')) {
+            showProductModal(product, category, price);
+          }
+        });
+      });
+      
+      // Switch views with animation
+      categoriesView.style.opacity = '0';
+      categoriesView.style.transform = 'translateY(-20px)';
+      categoriesView.style.display = 'none';
+      
+      productsView.style.display = 'block';
+      setTimeout(() => {
+        productsView.style.opacity = '1';
+        productsView.style.transform = 'translateY(0)';
+      }, 10);
+      
+      // Update category total display
+      updateCategoryTotal(category);
+    }
+    
+    // Show enhanced product modal
+    function showProductModal(product, category, price) {
+      const modal = document.getElementById('productModal');
+      const modalContent = document.getElementById('modalContent');
+      
+      // Generate HTML for modal
+      modalContent.innerHTML = `
+        <div class="modal-images">
+          <img src="${product['Product Image URL']}" alt="${product['Product Name']}" class="modal-main-image">
+        </div>
+        <div class="modal-details">
+          <h1 class="modal-title">${product['Product Name']}</h1>
+          <span class="modal-category">${category}</span>
+          <div class="modal-price">${price.toFixed(2)}</div>
+          <div class="modal-weight">${product['Weight/Volume']}</div>
+          <p class="modal-description">
+            Premium quality ${product['Product Name'].split(' ')[0]} with exquisite taste and texture. 
+            Perfect for gourmet cooking and healthy lifestyles. Imported from the finest sources.
+          </p>
+          <div class="modal-quantity">
+            <span class="modal-quantity-label">Quantity:</span>
+            <div class="quantity-selector">
+              <button class="quantity-btn minus" id="modalMinus">-</button>
+              <input type="number" min="0" value="${quantities[category][product['Product Name']]}" class="quantity-input" id="modalQuantity">
+              <button class="quantity-btn plus" id="modalPlus">+</button>
+            </div>
+          </div>
+        </div>
+      `;
+      
+      // Add event listeners to modal quantity controls
+      document.getElementById('modalMinus').addEventListener('click', () => {
+        const input = document.getElementById('modalQuantity');
+        let newQuantity = (parseInt(input.value) || 0) - 1;
+        newQuantity = Math.max(0, newQuantity);
+        input.value = newQuantity;
+        updateQuantityFromModal(product['Product Name'], category, newQuantity, price);
+      });
+      
+      document.getElementById('modalPlus').addEventListener('click', () => {
+        const input = document.getElementById('modalQuantity');
+        let newQuantity = (parseInt(input.value) || 0) + 1;
+        input.value = newQuantity;
+        updateQuantityFromModal(product['Product Name'], category, newQuantity, price);
+      });
+      
+      document.getElementById('modalQuantity').addEventListener('change', (e) => {
+        const newQuantity = parseInt(e.target.value) || 0;
+        updateQuantityFromModal(product['Product Name'], category, newQuantity, price);
+      });
+      
+      // Show modal
+      modal.classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }
+    
+    // Update quantity from modal
+    function updateQuantityFromModal(productName, category, quantity, price) {
+      quantities[category][productName] = quantity;
+      updateCategoryTotal(category);
+      
+      // Update the corresponding input in the products grid if visible
+      const productInput = document.querySelector(`.product-card input[value="${quantity}"]`);
+      if (productInput) {
+        productInput.value = quantity;
+      }
+    }
+    
+    // Update quantity for a product
+    function updateQuantity(productId, change, price) {
+      const input = document.getElementById(`quantity-${productId}`);
+      let newQuantity = (parseInt(input.value) || 0) + change;
+      newQuantity = Math.max(0, newQuantity);
+      input.value = newQuantity;
+      
+      setQuantity(productId, newQuantity, price);
+    }
+    
+    // Set quantity for a product
+    function setQuantity(productId, quantity, price) {
+      const parts = productId.split('-');
+      const category = parts.slice(0, -1).join(' ');
+      const index = parts[parts.length - 1];
+      
+      const productName = productData[category][parseInt(index)]['Product Name'];
+      quantities[category][productName] = quantity;
+      updateCategoryTotal(category);
+    }
+    
+    // Apply bulk quantity to all products in current category
+    document.getElementById('applyBulkBtn').addEventListener('click', function() {
+      const bulkQuantity = parseInt(document.getElementById('bulkQuantityInput').value) || 0;
+      const products = document.querySelectorAll('.product-card');
+      
+      products.forEach(product => {
+        const productId = product.querySelector('.plus').dataset.id;
+        const price = parseFloat(product.querySelector('.plus').dataset.price);
+        const input = product.querySelector('.quantity-input');
+        
+        input.value = bulkQuantity;
+        setQuantity(productId, bulkQuantity, price);
+      });
+    });
+    
+    // Update category total
+    function updateCategoryTotal(category) {
+      let total = 0;
+      
+      for (const product in quantities[category]) {
+        const productObj = productData[category].find(p => p['Product Name'] === product);
+        const cleanPrice = productObj['Price'].replace(/₹/g, '').trim();
+        const price = parseFloat(cleanPrice);
+        total += price * quantities[category][product];
+      }
+      
+      categoryTotals[category] = total;
+      document.getElementById(`categoryTotal-${category.replace(/ /g, '-')}`).textContent = `Total: ₹${total.toFixed(2)}`;
+      updateSummary();
+    }
+    
+    // Update summary section
+    function updateSummary() {
+      const categorySummaries = document.getElementById('categorySummaries');
+      let grandTotal = 0;
+      
+      categorySummaries.innerHTML = '';
+      
+      for (const category in categoryTotals) {
+        if (categoryTotals[category] > 0) {
+          const summaryItem = document.createElement('div');
+          summaryItem.className = 'category-summary';
+          summaryItem.innerHTML = `
+            <span class="category-summary-name">${category}</span>
+            <span class="category-summary-total">₹${categoryTotals[category].toFixed(2)}</span>
+          `;
+          categorySummaries.appendChild(summaryItem);
+          grandTotal += categoryTotals[category];
+        }
+      }
+      
+      document.getElementById('grandTotal').textContent = `₹${grandTotal.toFixed(2)}`;
+    }
+    
+    // Show categories view
+    function showCategories() {
+      const categoriesView = document.getElementById('categoriesView');
+      const productsView = document.getElementById('productsView');
+      const bulkQuantitySelector = document.getElementById('bulkQuantitySelector');
+      
+      // Hide bulk quantity selector
+      bulkQuantitySelector.style.display = 'none';
+      
+      // Switch views with animation
+      productsView.style.opacity = '0';
+      productsView.style.transform = 'translateY(20px)';
+      
+      setTimeout(() => {
+        productsView.style.display = 'none';
+        categoriesView.style.display = 'block';
+        
+        setTimeout(() => {
+          categoriesView.style.opacity = '1';
+          categoriesView.style.transform = 'translateY(0)';
+        }, 10);
+      }, 300);
+    }
+    
+    // Theme Toggle
+    document.getElementById('themeToggle').addEventListener('click', function() {
+      document.body.classList.toggle('light-mode');
+      const icon = this.querySelector('i');
+      if (document.body.classList.contains('light-mode')) {
+        icon.classList.remove('fa-moon');
+        icon.classList.add('fa-sun');
+      } else {
+        icon.classList.remove('fa-sun');
+        icon.classList.add('fa-moon');
+      }
+    });
+    
+    // Initialize
+    document.addEventListener('DOMContentLoaded', function() {
+      initializeQuantities();
+      
+      // Close modal when clicking outside
+      document.getElementById('productModal').addEventListener('click', function(e) {
+        if (e.target === document.getElementById('productModal')) {
+          document.getElementById('productModal').classList.remove('active');
+          document.body.style.overflow = 'auto';
+        }
+      });
+      
+      // Close modal with close button
+      document.getElementById('modalClose').addEventListener('click', function() {
+        document.getElementById('productModal').classList.remove('active');
+        document.body.style.overflow = 'auto';
+      });
+    });
+  </script>
+</body>
+</html>
