@@ -493,15 +493,37 @@ document.addEventListener('DOMContentLoaded', async () => {
       setQuantity(productId, newQuantity, price);
     }
     
-    function setQuantity(productId, quantity, price) {
-      const parts = productId.split('-');
-      const category = parts.slice(0, -1).join(' ');
-      const index = parts[parts.length - 1];
-      
-      const productName = productData[category][parseInt(index)]['Product Name'];
-      quantities[category][productName] = quantity;
-      updateCategoryTotal(category);
+function setQuantity(productId, quantity, price) {
+    try {
+        // Parse the product ID to get category and index
+        const parts = productId.split('-');
+        const category = parts.slice(0, -1).join(' ');
+        const index = parseInt(parts[parts.length - 1]);
+        
+        // Validate inputs
+        if (!productData[category] || !productData[category][index]) {
+            console.error('Invalid product reference:', {category, index});
+            return false;
+        }
+        
+        // Update the quantities object
+        const productName = productData[category][index]['Product Name'];
+        quantities[category][productName] = quantity;
+        
+        // Update the DOM input if it exists
+        const quantityInput = document.getElementById(`quantity-${productId}`);
+        if (quantityInput) {
+            quantityInput.value = quantity;
+        }
+        
+        // Update the category total
+        updateCategoryTotal(category);
+        return true;
+    } catch (error) {
+        console.error('Error in setQuantity:', error);
+        return false;
     }
+}
     
     document.getElementById('applyBulkBtn').addEventListener('click', function() {
       const bulkQuantity = parseInt(document.getElementById('bulkQuantityInput').value) || 0;
