@@ -307,118 +307,149 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
     
     function showProducts(category) {
-      currentCategory = category;
-      const categoriesView = document.getElementById('categoriesView');
-      const productsView = document.getElementById('productsView');
-      const categoryTitle = document.getElementById('categoryTitle');
-      const productsGrid = document.getElementById('productsGrid');
-      const bulkQuantitySelector = document.getElementById('bulkQuantitySelector');
-      
-      categoryTitle.textContent = category;
-      bulkQuantitySelector.style.display = 'flex';
-      productsGrid.innerHTML = '';
-      
-      // Reset selection when changing category
-      selectedProducts.clear();
-      
-      // Bulk quantity selector setup
-      bulkQuantitySelector.innerHTML = `
-        <span class="bulk-quantity-label">Apply quantity to all products:</span>
-        <input type="number" min="0" value="0" class="bulk-quantity-input" id="bulkQuantityInput">
-        <button class="apply-bulk-btn" id="applyBulkBtn">Apply</button>
-        <button class="delete-selected-btn" id="deleteSelectedBtn">
-          <i class="fas fa-trash"></i> Delete Selected
-        </button>
-        <label class="select-all-checkbox">
-          <input type="checkbox" id="selectAllCheckbox">
-          <span class="custom-checkbox"></span>
-          Select All
-        </label>
-      `;
-
-      // Add event listeners
-      document.getElementById('applyBulkBtn').addEventListener('click', applyBulkQuantity);
-      document.getElementById('deleteSelectedBtn').addEventListener('click', deleteSelectedProducts);
-      
-      document.getElementById('selectAllCheckbox').addEventListener('change', function(e) {
-        const checkboxes = document.querySelectorAll('.product-checkbox');
-        checkboxes.forEach(checkbox => {
-          checkbox.checked = e.target.checked;
-          const productId = checkbox.dataset.productId;
-          if (checkbox.checked) {
-            selectedProducts.add(productId);
-          } else {
-            selectedProducts.delete(productId);
-          }
-        });
-      });
-
-      const products = productData[category];
-      currentCategoryProducts = products;
-      
-      products.forEach((product, index) => {
-        const productId = product.id;
-        const cleanPrice = product['Price'].replace(/₹/g, '').trim();
-        const price = parseFloat(cleanPrice);
-        const productCardId = `${category.replace(/ /g, '-')}-${index}`;
+        // Reset products view first
+        const productsView = document.getElementById('productsView');
+        productsView.style.opacity = '0';
+        productsView.style.transform = 'translateY(20px)';
         
-        const productCard = document.createElement('div');
-        productCard.className = 'product-card';
-        productCard.innerHTML = `
-          <label class="product-checkbox-container">
-            <input type="checkbox" class="product-checkbox" data-product-id="${productId}">
-            <span class="custom-checkbox"></span>
-          </label>
-          <img src="${product['Product Image URL']}" alt="${product['Product Name']}" class="product-image" onerror="this.src='https://via.placeholder.com/200';">
-          <div class="product-info">
-            <div class="product-name">${product['Product Name']}</div>
-            <div class="product-price" id="price-${productCardId}">₹${price.toFixed(2)}</div>
-            <div class="product-weight">${product['Weight/Volume']}</div>
-            <div class="quantity-selector">
-              <button class="quantity-btn minus" data-id="${productCardId}" data-price="${price}">-</button>
-              <input type="number" min="0" value="${quantities[category][product['Product Name']]}" class="quantity-input" id="quantity-${productCardId}">
-              <button class="quantity-btn plus" data-id="${productCardId}" data-price="${price}">+</button>
-            </div>
-          </div>
-        `;
+        // Clear previous content immediately
+        const productsGrid = document.getElementById('productsGrid');
+        productsGrid.innerHTML = '';
         
-        const checkbox = productCard.querySelector('.product-checkbox');
-        checkbox.addEventListener('change', function(e) {
-          if (e.target.checked) {
-            selectedProducts.add(productId);
-          } else {
-            selectedProducts.delete(productId);
-            document.getElementById('selectAllCheckbox').checked = false;
-          }
-        });
-
-        productsGrid.appendChild(productCard);
+        // Update current category
+        currentCategory = category;
         
-        productCard.querySelector('.minus').addEventListener('click', (e) => {
-          updateQuantity(e.target.dataset.id, -1, parseFloat(e.target.dataset.price));
-        });
-        
-        productCard.querySelector('.plus').addEventListener('click', (e) => {
-          updateQuantity(e.target.dataset.id, 1, parseFloat(e.target.dataset.price));
-        });
-        
-        productCard.querySelector('.quantity-input').addEventListener('change', (e) => {
-          const newQuantity = parseInt(e.target.value) || 0;
-          const productId = e.target.id.replace('quantity-', '');
-          const price = parseFloat(document.getElementById(`price-${productId}`).textContent.replace(/₹/g, ''));
-          setQuantity(productId, newQuantity, price);
-        });
-        
-        productCard.addEventListener('click', (e) => {
-          if (!e.target.closest('.quantity-selector') && !e.target.closest('.product-checkbox-container')) {
-            showProductModal(product, category, price);
-          }
-        });
-      });
-      
-      categoriesView.style.display = 'none';
-      productsView.style.display = 'block';
-      updateCategoryTotal(category);
+        // After a brief delay, load new products
+        setTimeout(() => {
+            // Set up the UI
+            const categoriesView = document.getElementById('categoriesView');
+            const categoryTitle = document.getElementById('categoryTitle');
+            const bulkQuantitySelector = document.getElementById('bulkQuantitySelector');
+            
+            categoryTitle.textContent = category;
+            bulkQuantitySelector.style.display = 'flex';
+            
+            // Reset selection when changing category
+            selectedProducts.clear();
+            
+            // Bulk quantity selector setup
+            bulkQuantitySelector.innerHTML = `
+                <span class="bulk-quantity-label">Apply quantity to all products:</span>
+                <input type="number" min="0" value="0" class="bulk-quantity-input" id="bulkQuantityInput">
+                <button class="apply-bulk-btn" id="applyBulkBtn">Apply</button>
+                <button class="delete-selected-btn" id="deleteSelectedBtn">
+                    <i class="fas fa-trash"></i> Delete Selected
+                </button>
+                <label class="select-all-checkbox">
+                    <input type="checkbox" id="selectAllCheckbox">
+                    <span class="custom-checkbox"></span>
+                    Select All
+                </label>
+            `;
+    
+            // Add fresh event listeners
+            const applyBtn = document.getElementById('applyBulkBtn');
+            applyBtn.replaceWith(applyBtn.cloneNode(true)); // Remove old listeners
+            document.getElementById('applyBulkBtn').addEventListener('click', applyBulkQuantity);
+            
+            const deleteBtn = document.getElementById('deleteSelectedBtn');
+            deleteBtn.replaceWith(deleteBtn.cloneNode(true));
+            document.getElementById('deleteSelectedBtn').addEventListener('click', deleteSelectedProducts);
+            
+            const selectAll = document.getElementById('selectAllCheckbox');
+            selectAll.replaceWith(selectAll.cloneNode(true));
+            document.getElementById('selectAllCheckbox').addEventListener('change', function(e) {
+                const checkboxes = document.querySelectorAll('.product-checkbox');
+                checkboxes.forEach(checkbox => {
+                    checkbox.checked = e.target.checked;
+                    const productId = checkbox.dataset.productId;
+                    if (checkbox.checked) {
+                        selectedProducts.add(productId);
+                    } else {
+                        selectedProducts.delete(productId);
+                    }
+                });
+            });
+    
+            // Load and display products
+            const products = productData[category];
+            currentCategoryProducts = products;
+            
+            if (!products || products.length === 0) {
+                productsGrid.innerHTML = '<div class="error">No products found in this category</div>';
+            } else {
+                products.forEach((product, index) => {
+                    const productId = product.id;
+                    const cleanPrice = product['Price'].replace(/₹/g, '').trim();
+                    const price = parseFloat(cleanPrice);
+                    const productCardId = `${category.replace(/ /g, '-')}-${index}`;
+                    
+                    const productCard = document.createElement('div');
+                    productCard.className = 'product-card';
+                    productCard.innerHTML = `
+                        <label class="product-checkbox-container">
+                            <input type="checkbox" class="product-checkbox" data-product-id="${productId}">
+                            <span class="custom-checkbox"></span>
+                        </label>
+                        <img src="${product['Product Image URL']}" alt="${product['Product Name']}" class="product-image" onerror="this.src='https://via.placeholder.com/200';">
+                        <div class="product-info">
+                            <div class="product-name">${product['Product Name']}</div>
+                            <div class="product-price" id="price-${productCardId}">₹${price.toFixed(2)}</div>
+                            <div class="product-weight">${product['Weight/Volume']}</div>
+                            <div class="quantity-selector">
+                                <button class="quantity-btn minus" data-id="${productCardId}" data-price="${price}">-</button>
+                                <input type="number" min="0" value="${quantities[category][product['Product Name']]}" class="quantity-input" id="quantity-${productCardId}">
+                                <button class="quantity-btn plus" data-id="${productCardId}" data-price="${price}">+</button>
+                            </div>
+                        </div>
+                    `;
+                    
+                    // Add event listeners to the new card
+                    const checkbox = productCard.querySelector('.product-checkbox');
+                    checkbox.addEventListener('change', function(e) {
+                        if (e.target.checked) {
+                            selectedProducts.add(productId);
+                        } else {
+                            selectedProducts.delete(productId);
+                            document.getElementById('selectAllCheckbox').checked = false;
+                        }
+                    });
+    
+                    productCard.querySelector('.minus').addEventListener('click', (e) => {
+                        updateQuantity(e.target.dataset.id, -1, parseFloat(e.target.dataset.price));
+                    });
+                    
+                    productCard.querySelector('.plus').addEventListener('click', (e) => {
+                        updateQuantity(e.target.dataset.id, 1, parseFloat(e.target.dataset.price));
+                    });
+                    
+                    productCard.querySelector('.quantity-input').addEventListener('change', (e) => {
+                        const newQuantity = parseInt(e.target.value) || 0;
+                        const productId = e.target.id.replace('quantity-', '');
+                        const price = parseFloat(document.getElementById(`price-${productId}`).textContent.replace(/₹/g, ''));
+                        setQuantity(productId, newQuantity, price);
+                    });
+                    
+                    productCard.addEventListener('click', (e) => {
+                        if (!e.target.closest('.quantity-selector') && !e.target.closest('.product-checkbox-container')) {
+                            showProductModal(product, category, price);
+                        }
+                    });
+                    
+                    productsGrid.appendChild(productCard);
+                });
+            }
+            
+            // Show the products view with animation
+            categoriesView.style.display = 'none';
+            productsView.style.display = 'block';
+            setTimeout(() => {
+                productsView.style.opacity = '1';
+                productsView.style.transform = 'translateY(0)';
+            }, 10);
+            
+            updateCategoryTotal(category);
+        }, 50); // Small delay to allow CSS transitions
     }
     
     function showProductModal(product, category, price) {
@@ -610,24 +641,25 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
     
     function showCategories() {
-      const categoriesView = document.getElementById('categoriesView');
-      const productsView = document.getElementById('productsView');
-      const bulkQuantitySelector = document.getElementById('bulkQuantitySelector');
-      
-      bulkQuantitySelector.style.display = 'none';
-      
-      productsView.style.opacity = '0';
-      productsView.style.transform = 'translateY(20px)';
-      
-      setTimeout(() => {
-        productsView.style.display = 'none';
-        categoriesView.style.display = 'block';
+        const categoriesView = document.getElementById('categoriesView');
+        const productsView = document.getElementById('productsView');
+        const bulkQuantitySelector = document.getElementById('bulkQuantitySelector');
+        
+        // Reset products view
+        productsView.style.opacity = '0';
+        productsView.style.transform = 'translateY(20px)';
+        bulkQuantitySelector.style.display = 'none';
         
         setTimeout(() => {
-          categoriesView.style.opacity = '1';
-          categoriesView.style.transform = 'translateY(0)';
-        }, 10);
-      }, 300);
+            productsView.style.display = 'none';
+            categoriesView.style.display = 'block';
+            
+            // Force reflow to ensure animation works
+            void categoriesView.offsetWidth;
+            
+            categoriesView.style.opacity = '1';
+            categoriesView.style.transform = 'translateY(0)';
+        }, 300);
     }
     
     // Theme Toggle
