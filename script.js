@@ -6,7 +6,19 @@ const categoryTotals = {};
 let currentCategory = '';
 let selectedProducts = new Set();
 let currentCategoryProducts = [];
+  
+console.log("Supabase URL:", supabase.supabaseUrl);
+console.log("Supabase Key:", supabase.supabaseKey);
 
+// Test a simple query
+supabase
+  .from('categories')
+  .select('*')
+  .limit(1)
+  .then(({ data, error }) => {
+    console.log("Test Query Results:", { data, error });
+  })
+  .catch(err => console.error("Query Failed:", err));
 console.log('Supabase instance:', window.supabase);
 // Wait for supabase to be available
 function ensureSupabase() {
