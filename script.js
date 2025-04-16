@@ -26,6 +26,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         details: error.details
       });
     }
+
     // Wait for supabase to be available
     function ensureSupabase() {
       return new Promise((resolve) => {
@@ -214,6 +215,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         showNotification('Failed to delete products: ' + error.message, 'error');
       }
     }
+
     async function renderCategories() {
       try {
         console.log('[1] Starting renderCategories');
@@ -304,121 +306,53 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
     }
     
-function showProducts(category) {
-    currentCategory = category;
-    const categoriesView = document.getElementById('categoriesView');
-    const productsView = document.getElementById('productsView');
-    const categoryTitle = document.getElementById('categoryTitle');
-    const productsGrid = document.getElementById('productsGrid');
-    const bulkQuantitySelector = document.getElementById('bulkQuantitySelector');
-    
-    categoryTitle.textContent = category;
-    bulkQuantitySelector.style.display = 'flex';
-    productsGrid.innerHTML = '';
-    
-    // Reset selection when changing category
-    selectedProducts.clear();
-    
-    // Bulk quantity selector setup
-    bulkQuantitySelector.innerHTML = `
+    function showProducts(category) {
+      currentCategory = category;
+      const categoriesView = document.getElementById('categoriesView');
+      const productsView = document.getElementById('productsView');
+      const categoryTitle = document.getElementById('categoryTitle');
+      const productsGrid = document.getElementById('productsGrid');
+      const bulkQuantitySelector = document.getElementById('bulkQuantitySelector');
+      
+      categoryTitle.textContent = category;
+      bulkQuantitySelector.style.display = 'flex';
+      productsGrid.innerHTML = '';
+      
+      // Reset selection when changing category
+      selectedProducts.clear();
+      
+      // Bulk quantity selector setup
+      bulkQuantitySelector.innerHTML = `
         <span class="bulk-quantity-label">Apply quantity to all products:</span>
         <input type="number" min="0" value="0" class="bulk-quantity-input" id="bulkQuantityInput">
         <button class="apply-bulk-btn" id="applyBulkBtn">Apply</button>
         <button class="delete-selected-btn" id="deleteSelectedBtn">
-            <i class="fas fa-trash"></i> Delete Selected
+          <i class="fas fa-trash"></i> Delete Selected
         </button>
         <label class="select-all-checkbox">
-            <input type="checkbox" id="selectAllCheckbox">
-            <span class="custom-checkbox"></span>
-            Select All
+          <input type="checkbox" id="selectAllCheckbox">
+          <span class="custom-checkbox"></span>
+          Select All
         </label>
-    `;
+      `;
 
-    // Add event listeners
-    document.getElementById('applyBulkBtn').addEventListener('click', applyBulkQuantity);
-    document.getElementById('deleteSelectedBtn').addEventListener('click', deleteSelectedProducts);
-    
-    document.getElementById('selectAllCheckbox').addEventListener('change', function(e) {
+      // Add event listeners
+      document.getElementById('applyBulkBtn').addEventListener('click', applyBulkQuantity);
+      document.getElementById('deleteSelectedBtn').addEventListener('click', deleteSelectedProducts);
+      
+      document.getElementById('selectAllCheckbox').addEventListener('change', function(e) {
         const checkboxes = document.querySelectorAll('.product-checkbox');
         checkboxes.forEach(checkbox => {
-            checkbox.checked = e.target.checked;
-            const productId = checkbox.dataset.productId;
-            if (checkbox.checked) {
-                selectedProducts.add(productId);
-            } else {
-                selectedProducts.delete(productId);
-            }
+          checkbox.checked = e.target.checked;
+          const productId = checkbox.dataset.productId;
+          if (checkbox.checked) {
+            selectedProducts.add(productId);
+          } else {
+            selectedProducts.delete(productId);
+          }
         });
-    });
+      });
 
-    const products = productData[category];
-    currentCategoryProducts = products;
-    
-    products.forEach((product, index) => {
-        const productId = product.id;
-        const cleanPrice = product['Price'].replace(/₹/g, '').trim();
-        const price = parseFloat(cleanPrice);
-        const productCardId = `${category.replace(/ /g, '-')}-${index}`;
-        
-        const productCard = document.createElement('div');
-        productCard.className = 'product-card';
-        productCard.innerHTML = `
-            <label class="product-checkbox-container">
-                <input type="checkbox" class="product-checkbox" data-product-id="${productId}">
-                <span class="custom-checkbox"></span>
-            </label>
-            <img src="${product['Product Image URL']}" alt="${product['Product Name']}" class="product-image" onerror="this.src='https://via.placeholder.com/200';">
-            <div class="product-info">
-                <div class="product-name">${product['Product Name']}</div>
-                <div class="product-price" id="price-${productCardId}">₹${price.toFixed(2)}</div>
-                <div class="product-weight">${product['Weight/Volume']}</div>
-                <div class="quantity-selector">
-                    <button class="quantity-btn minus" data-id="${productCardId}" data-price="${price}">-</button>
-                    <input type="number" min="0" value="${quantities[category][product['Product Name']]}" class="quantity-input" id="quantity-${productCardId}">
-                    <button class="quantity-btn plus" data-id="${productCardId}" data-price="${price}">+</button>
-                </div>
-            </div>
-        `;
-        
-        const checkbox = productCard.querySelector('.product-checkbox');
-        checkbox.addEventListener('change', function(e) {
-            if (e.target.checked) {
-                selectedProducts.add(productId);
-            } else {
-                selectedProducts.delete(productId);
-                document.getElementById('selectAllCheckbox').checked = false;
-            }
-        });
-
-        productsGrid.appendChild(productCard);
-        
-        productCard.querySelector('.minus').addEventListener('click', (e) => {
-            updateQuantity(e.target.dataset.id, -1, parseFloat(e.target.dataset.price));
-        });
-        
-        productCard.querySelector('.plus').addEventListener('click', (e) => {
-            updateQuantity(e.target.dataset.id, 1, parseFloat(e.target.dataset.price));
-        });
-        
-        productCard.querySelector('.quantity-input').addEventListener('change', (e) => {
-            const newQuantity = parseInt(e.target.value) || 0;
-            const productId = e.target.id.replace('quantity-', '');
-            const price = parseFloat(document.getElementById(`price-${productId}`).textContent.replace(/₹/g, ''));
-            setQuantity(productId, newQuantity, price);
-        });
-        
-        productCard.addEventListener('click', (e) => {
-            if (!e.target.closest('.quantity-selector') && !e.target.closest('.product-checkbox-container')) {
-                showProductModal(product, category, price);
-            }
-        });
-    });
-    
-    categoriesView.style.display = 'none';
-    productsView.style.display = 'block';
-    updateCategoryTotal(category);
-}
-    
       const products = productData[category];
       currentCategoryProducts = products;
       
@@ -438,7 +372,7 @@ function showProducts(category) {
           <img src="${product['Product Image URL']}" alt="${product['Product Name']}" class="product-image" onerror="this.src='https://via.placeholder.com/200';">
           <div class="product-info">
             <div class="product-name">${product['Product Name']}</div>
-            <div class="product-price" id="price-${productCardId}">${price.toFixed(2)}</div>
+            <div class="product-price" id="price-${productCardId}">₹${price.toFixed(2)}</div>
             <div class="product-weight">${product['Weight/Volume']}</div>
             <div class="quantity-selector">
               <button class="quantity-btn minus" data-id="${productCardId}" data-price="${price}">-</button>
@@ -457,7 +391,7 @@ function showProducts(category) {
             document.getElementById('selectAllCheckbox').checked = false;
           }
         });
-    
+
         productsGrid.appendChild(productCard);
         
         productCard.querySelector('.minus').addEventListener('click', (e) => {
@@ -482,16 +416,8 @@ function showProducts(category) {
         });
       });
       
-      categoriesView.style.opacity = '0';
-      categoriesView.style.transform = 'translateY(-20px)';
       categoriesView.style.display = 'none';
-      
       productsView.style.display = 'block';
-      setTimeout(() => {
-        productsView.style.opacity = '1';
-        productsView.style.transform = 'translateY(0)';
-      }, 10);
-      
       updateCategoryTotal(category);
     }
     
@@ -548,14 +474,26 @@ function showProducts(category) {
       quantities[category][productName] = quantity;
       updateCategoryTotal(category);
       
-      const productInput = document.querySelector(`.product-card input[value="${quantity}"]`);
-      if (productInput) {
-        productInput.value = quantity;
-      }
+      // Find and update the corresponding product card input
+      const productCards = document.querySelectorAll('.product-card');
+      productCards.forEach(card => {
+        const productTitle = card.querySelector('.product-name');
+        if (productTitle && productTitle.textContent === productName) {
+          const input = card.querySelector('.quantity-input');
+          if (input) {
+            input.value = quantity;
+          }
+        }
+      });
     }
     
     function updateQuantity(productId, change, price) {
       const input = document.getElementById(`quantity-${productId}`);
+      if (!input) {
+        console.error('Quantity input not found for:', productId);
+        return;
+      }
+      
       let newQuantity = (parseInt(input.value) || 0) + change;
       newQuantity = Math.max(0, newQuantity);
       input.value = newQuantity;
@@ -563,63 +501,79 @@ function showProducts(category) {
       setQuantity(productId, newQuantity, price);
     }
     
-function setQuantity(productId, quantity, price) {
-    try {
-        // Parse the product ID to get category and index
+    function setQuantity(productId, quantity, price) {
+      try {
         const parts = productId.split('-');
         const category = parts.slice(0, -1).join(' ');
         const index = parseInt(parts[parts.length - 1]);
         
-        // Validate inputs
         if (!productData[category] || !productData[category][index]) {
-            console.error('Invalid product reference:', {category, index});
-            return false;
+          console.error('Invalid product reference:', {category, index});
+          return false;
         }
         
-        // Update the quantities object
         const productName = productData[category][index]['Product Name'];
         quantities[category][productName] = quantity;
         
-        // Update the DOM input if it exists
         const quantityInput = document.getElementById(`quantity-${productId}`);
         if (quantityInput) {
-            quantityInput.value = quantity;
+          quantityInput.value = quantity;
         }
         
-        // Update the category total
         updateCategoryTotal(category);
         return true;
-    } catch (error) {
+      } catch (error) {
         console.error('Error in setQuantity:', error);
         return false;
+      }
     }
-}
     
-document.getElementById('applyBulkBtn').addEventListener('click', function() {
-    const bulkQuantity = parseInt(document.getElementById('bulkQuantityInput').value) || 0;
-    
-    // Get all product cards in current view
-    const productCards = document.querySelectorAll('.product-card');
-    
-    productCards.forEach(card => {
-        const plusButton = card.querySelector('.plus');
-        if (plusButton) {
-            const productId = plusButton.dataset.id;
-            const price = parseFloat(plusButton.dataset.price);
-            
-            // Use our enhanced setQuantity function
-            setQuantity(productId, bulkQuantity, price);
+    function applyBulkQuantity() {
+        const bulkQuantity = parseInt(document.getElementById('bulkQuantityInput').value) || 0;
+        console.log('Applying bulk quantity:', bulkQuantity);
+        
+        if (isNaN(bulkQuantity)) {  // Fixed: Added missing closing parenthesis
+            showNotification('Please enter a valid quantity', 'warning');
+            return;
         }
-    });
-    
-    showNotification(`Applied quantity ${bulkQuantity} to all products`, 'success');
-});
+        
+        const products = currentCategoryProducts;
+        if (!products || products.length === 0) {
+            console.error('No products to update');
+            return;
+        }
+        
+        products.forEach((product, index) => {
+            const productCardId = `${currentCategory.replace(/ /g, '-')}-${index}`;
+            const cleanPrice = product['Price'].replace(/₹/g, '').trim();
+            const price = parseFloat(cleanPrice);
+            
+            // Update the quantities object
+            quantities[currentCategory][product['Product Name']] = bulkQuantity;
+            
+            // Update the DOM input if it exists
+            const input = document.getElementById(`quantity-${productCardId}`);
+            if (input) {
+                input.value = bulkQuantity;
+            }
+        });
+        
+        updateCategoryTotal(currentCategory);
+        showNotification(`Applied quantity ${bulkQuantity} to all products`, 'success');
+    }
     
     function updateCategoryTotal(category) {
       let total = 0;
       
+      if (!quantities[category] || !productData[category]) {
+        console.error('Invalid category reference:', category);
+        return;
+      }
+
       for (const product in quantities[category]) {
         const productObj = productData[category].find(p => p['Product Name'] === product);
+        if (!productObj) continue;
+        
         const cleanPrice = productObj['Price'].replace(/₹/g, '').trim();
         const price = parseFloat(cleanPrice);
         total += price * quantities[category][product];
@@ -886,6 +840,7 @@ document.getElementById('applyBulkBtn').addEventListener('click', function() {
         if (testError) {
           throw testError;
         }
+        
         // Populate category dropdown
         const { data: categories } = await supabase
           .from('categories')
@@ -908,18 +863,22 @@ document.getElementById('applyBulkBtn').addEventListener('click', function() {
         
         await renderCategories();
         
+        // Setup modal event listeners
         document.getElementById('productModal').addEventListener('click', function(e) {
           if (e.target === document.getElementById('productModal')) {
             document.getElementById('productModal').classList.remove('active');
             document.body.style.overflow = 'auto';
           }
         });
-        document.getElementById('backToCategoriesBtn').addEventListener('click', showCategories);
-          
+        
         document.getElementById('modalClose').addEventListener('click', function() {
           document.getElementById('productModal').classList.remove('active');
           document.body.style.overflow = 'auto';
         });
+        
+        // Add back to categories button listener
+        document.getElementById('backToCategoriesBtn').addEventListener('click', showCategories);
+        
       } catch (error) {
         console.error('Failed to initialize app:', error);
         document.getElementById('loading').style.display = 'none';
@@ -929,5 +888,5 @@ document.getElementById('applyBulkBtn').addEventListener('click', function() {
     }
     
     // Start the application
-    await initializeApp();
-    });
+    initializeApp();
+});
