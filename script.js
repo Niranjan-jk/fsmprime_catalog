@@ -214,7 +214,6 @@ async function deleteSelectedProducts() {
     showNotification('Failed to delete products: ' + error.message, 'error');
   }
 }
-
 async function renderCategories() {
   try {
     console.log('[1] Starting renderCategories');
@@ -280,7 +279,7 @@ async function renderCategories() {
     console.log('[10] Current categoriesGrid children:', 
       categoriesGrid.children.length, 
       Array.from(categoriesGrid.children).map(el => el.outerHTML.slice(0, 50) + '...'
-    );)
+    );
 
   } catch (err) {
     console.error('[ERROR] In renderCategories:', {
