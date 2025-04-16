@@ -217,25 +217,45 @@ async function deleteSelectedProducts() {
 
 async function renderCategories() {
   try {
+    console.log('[1] Starting renderCategories');
+    
     await ensureSupabase();
+    console.log('[2] Supabase connection verified');
+
     const categoriesGrid = document.getElementById('categoriesGrid');
     const loading = document.getElementById('loading');
     const error = document.getElementById('error');
+    
+    console.log('[3] DOM elements:', {
+      categoriesGridExists: !!categoriesGrid,
+      loadingExists: !!loading,
+      errorExists: !!error
+    });
+
     categoriesGrid.innerHTML = '';
     loading.style.display = 'block';
     error.style.display = 'none';
+    console.log('[4] Reset UI elements');
 
     const categories = await fetchCategories();
-    loading.style.display = 'none';
+    console.log('[5] Fetched categories:', categories);
 
+    loading.style.display = 'none';
+    
     if (!categories || categories.length === 0) {
+      console.warn('[6] No categories found');
       error.textContent = 'No categories found. Add products to display categories.';
       error.style.display = 'block';
       return;
     }
 
-    for (const category of categories) {
+    console.log('[7] Processing categories...');
+    for (const [index, category] of categories.entries()) {
+      console.log(`[7.${index}] Processing category: ${category.name}`);
+      
       const products = await fetchProductsByCategory(category.name);
+      console.log(`[7.${index}.1] Products for ${category.name}:`, products);
+      
       productData[category.name] = products;
 
       const categoryCard = document.createElement('div');
@@ -246,12 +266,28 @@ async function renderCategories() {
         <div class="product-count">${products.length} products</div>
         <div class="category-total" id="categoryTotal-${category.name.replace(/ /g, '-')}">Total: ₹0</div>
       `;
+      
+      console.log(`[7.${index}.2] Created card for ${category.name}`);
       categoriesGrid.appendChild(categoryCard);
+      console.log(`[7.${index}.3] Appended card to DOM`);
     }
 
+    console.log('[8] Initializing quantities');
     initializeQuantities();
+    console.log('[9] Render completed successfully');
+
+    // Debug: Verify DOM actually contains cards
+    console.log('[10] Current categoriesGrid children:', 
+      categoriesGrid.children.length, 
+      Array.from(categoriesGrid.children).map(el => el.outerHTML.slice(0, 50) + '...'
+    );
+
   } catch (err) {
-    console.error('Error in renderCategories:', err);
+    console.error('[ERROR] In renderCategories:', {
+      error: err,
+      message: err.message,
+      stack: err.stack
+    });
     document.getElementById('loading').style.display = 'none';
     document.getElementById('error').textContent = 'Failed to load categories: ' + err.message;
     document.getElementById('error').style.display = 'block';
