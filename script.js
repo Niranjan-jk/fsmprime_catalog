@@ -394,7 +394,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                         <img src="${product['Product Image URL']}" alt="${product['Product Name']}" class="product-image" onerror="this.src='https://via.placeholder.com/200';">
                         <div class="product-info">
                             <div class="product-name">${product['Product Name']}</div>
-                            <div class="product-price" id="price-${productCardId}">₹${price.toFixed(2)}</div>
+                            <div class="product-price" id="price-${productCardId}">${price.toFixed(2)}</div>
                             <div class="product-weight">${product['Weight/Volume']}</div>
                             <div class="quantity-selector">
                                 <button class="quantity-btn minus" data-id="${productCardId}" data-price="${price}">-</button>
@@ -463,7 +463,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         <div class="modal-details">
           <h1 class="modal-title">${product['Product Name']}</h1>
           <span class="modal-category">${category}</span>
-          <div class="modal-price">₹${price.toFixed(2)}</div>
+          <div class="modal-price">${price.toFixed(2)}</div>
           <div class="modal-weight">${product['Weight/Volume']}</div>
           <p class="modal-description">${product['Description']}</p>
           <div class="modal-quantity">
