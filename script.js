@@ -54,7 +54,7 @@ async function fetchCategories() {
     console.log('Fetching categories from Supabase...');
   const { data, error } = await window.supabase
     .from('categories')
-    .select('*');
+    .select('*')
       .order('name', { ascending: true });
 
     if (error) {
