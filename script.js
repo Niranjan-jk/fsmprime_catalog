@@ -304,40 +304,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
     }
     
-    function applyBulkQuantity() {
-        const bulkQuantity = parseInt(document.getElementById('bulkQuantityInput').value) || 0;
-        console.log('Applying bulk quantity:', bulkQuantity);
-        
-        if (isNaN(bulkQuantity) || bulkQuantity < 0) {
-            showNotification('Please enter a valid quantity (0 or higher)', 'warning');
-            return;
-        }
-    
-        const products = currentCategoryProducts;
-        if (!products || products.length === 0) {
-            console.error('No products found in current category');
-            return;
-        }
-    
-        products.forEach((product, index) => {
-            const productCardId = `${currentCategory.replace(/ /g, '-')}-${index}`;
-            const cleanPrice = product['Price'].replace(/₹/g, '').trim();
-            const price = parseFloat(cleanPrice);
-            
-            // Update the input display
-            const input = document.getElementById(`quantity-${productCardId}`);
-            if (input) {
-                input.value = bulkQuantity;
-            }
-            
-            // Update the quantities object
-            quantities[currentCategory][product['Product Name']] = bulkQuantity;
-        });
-        
-        updateCategoryTotal(currentCategory);
-        showNotification(`Applied quantity ${bulkQuantity} to all products`, 'success');
-    } 
-
 function showProducts(category) {
     currentCategory = category;
     const categoriesView = document.getElementById('categoriesView');
@@ -527,7 +493,7 @@ function showProducts(category) {
       }, 10);
       
       updateCategoryTotal(category);
-    },
+    }
     
     function showProductModal(product, category, price) {
       const modal = document.getElementById('productModal');
@@ -576,7 +542,7 @@ function showProducts(category) {
       
       modal.classList.add('active');
       document.body.style.overflow = 'hidden';
-    },
+    }
     
     function updateQuantityFromModal(productName, category, quantity, price) {
       quantities[category][productName] = quantity;
@@ -586,53 +552,50 @@ function showProducts(category) {
       if (productInput) {
         productInput.value = quantity;
       }
-    },
+    }
     
     function updateQuantity(productId, change, price) {
-        const input = document.getElementById(`quantity-${productId}`);
-        if (!input) {
-            console.error('Quantity input not found for product:', productId);
-            return;
-        }
-        
-        let newQuantity = (parseInt(input.value) || 0) + change;
-        newQuantity = Math.max(0, newQuantity);
-        input.value = newQuantity;
-        
-        setQuantity(productId, newQuantity, price);
-    },
+      const input = document.getElementById(`quantity-${productId}`);
+      let newQuantity = (parseInt(input.value) || 0) + change;
+      newQuantity = Math.max(0, newQuantity);
+      input.value = newQuantity;
+      
+      setQuantity(productId, newQuantity, price);
+    }
     
-    function setQuantity(productId, quantity, price) {
-        try {
-            const parts = productId.split('-');
-            const category = parts.slice(0, -1).join(' ');
-            const index = parseInt(parts[parts.length - 1]);
-            
-            // Validate the product exists
-            if (!productData[category] || !productData[category][index]) {
-                console.error('Product not found:', {category, index});
-                return false;
-            }
-            
-            // Update quantities object
-            const productName = productData[category][index]['Product Name'];
-            quantities[category][productName] = quantity;
-            
-            // Update the DOM input if it exists
-            const quantityInput = document.getElementById(`quantity-${productId}`);
-            if (quantityInput) {
-                quantityInput.value = quantity;
-            }
-            
-            updateCategoryTotal(category);
-            return true;
-        } catch (error) {
-            console.error('Error in setQuantity:', error);
+function setQuantity(productId, quantity, price) {
+    try {
+        // Parse the product ID to get category and index
+        const parts = productId.split('-');
+        const category = parts.slice(0, -1).join(' ');
+        const index = parseInt(parts[parts.length - 1]);
+        
+        // Validate inputs
+        if (!productData[category] || !productData[category][index]) {
+            console.error('Invalid product reference:', {category, index});
             return false;
         }
-    },
+        
+        // Update the quantities object
+        const productName = productData[category][index]['Product Name'];
+        quantities[category][productName] = quantity;
+        
+        // Update the DOM input if it exists
+        const quantityInput = document.getElementById(`quantity-${productId}`);
+        if (quantityInput) {
+            quantityInput.value = quantity;
+        }
+        
+        // Update the category total
+        updateCategoryTotal(category);
+        return true;
+    } catch (error) {
+        console.error('Error in setQuantity:', error);
+        return false;
+    }
+}
     
-    document.getElementById('applyBulkBtn').addEventListener('click', function() {
+document.getElementById('applyBulkBtn').addEventListener('click', function() {
     const bulkQuantity = parseInt(document.getElementById('bulkQuantityInput').value) || 0;
     
     // Get all product cards in current view
@@ -650,32 +613,25 @@ function showProducts(category) {
     });
     
     showNotification(`Applied quantity ${bulkQuantity} to all products`, 'success');
-    }),
+});
     
     function updateCategoryTotal(category) {
-        let total = 0;
-        
-        if (!quantities[category] || !productData[category]) {
-            console.error('Invalid category reference:', category);
-            return;
-        }
-    
-        for (const product in quantities[category]) {
-            const productObj = productData[category].find(p => p['Product Name'] === product);
-            if (!productObj) continue;
-            
-            const cleanPrice = productObj['Price'].replace(/₹/g, '').trim();
-            const price = parseFloat(cleanPrice);
-            total += price * quantities[category][product];
-        }
-        
-        categoryTotals[category] = total;
-        const totalElement = document.getElementById(`categoryTotal-${category.replace(/ /g, '-')}`);
-        if (totalElement) {
-            totalElement.textContent = `Total: ₹${total.toFixed(2)}`;
-        }
-        updateSummary();
-    },
+      let total = 0;
+      
+      for (const product in quantities[category]) {
+        const productObj = productData[category].find(p => p['Product Name'] === product);
+        const cleanPrice = productObj['Price'].replace(/₹/g, '').trim();
+        const price = parseFloat(cleanPrice);
+        total += price * quantities[category][product];
+      }
+      
+      categoryTotals[category] = total;
+      const totalElement = document.getElementById(`categoryTotal-${category.replace(/ /g, '-')}`);
+      if (totalElement) {
+        totalElement.textContent = `Total: ₹${total.toFixed(2)}`;
+      }
+      updateSummary();
+    }
     
     function updateSummary() {
       const categorySummaries = document.getElementById('categorySummaries');
@@ -697,7 +653,7 @@ function showProducts(category) {
       }
       
       document.getElementById('grandTotal').textContent = `₹${grandTotal.toFixed(2)}`;
-    },
+    }
     
     function showCategories() {
       const categoriesView = document.getElementById('categoriesView');
@@ -718,7 +674,7 @@ function showProducts(category) {
           categoriesView.style.transform = 'translateY(0)';
         }, 10);
       }, 300);
-    },
+    }
     
     // Theme Toggle
     document.getElementById('themeToggle').addEventListener('click', function() {
@@ -731,7 +687,7 @@ function showProducts(category) {
         icon.classList.remove('fa-sun');
         icon.classList.add('fa-moon');
       }
-    }))
+    });
     
     // Add Product Modal
     document.getElementById('addProductBtn').addEventListener('click', () => {
