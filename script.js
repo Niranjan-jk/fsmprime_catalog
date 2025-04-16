@@ -525,7 +525,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       }, 10);
       
       updateCategoryTotal(category);
-    }
+    })
     
     function showProductModal(product, category, price) {
       const modal = document.getElementById('productModal');
