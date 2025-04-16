@@ -525,19 +525,25 @@ function setQuantity(productId, quantity, price) {
     }
 }
     
-    document.getElementById('applyBulkBtn').addEventListener('click', function() {
-      const bulkQuantity = parseInt(document.getElementById('bulkQuantityInput').value) || 0;
-      const products = document.querySelectorAll('.product-card');
-      
-      products.forEach(product => {
-        const productId = product.querySelector('.plus').dataset.id;
-        const price = parseFloat(product.querySelector('.plus').dataset.price);
-        const input = product.querySelector('.quantity-input');
-        
-        input.value = bulkQuantity;
-        setQuantity(productId, bulkQuantity, price);
-      });
+document.getElementById('applyBulkBtn').addEventListener('click', function() {
+    const bulkQuantity = parseInt(document.getElementById('bulkQuantityInput').value) || 0;
+    
+    // Get all product cards in current view
+    const productCards = document.querySelectorAll('.product-card');
+    
+    productCards.forEach(card => {
+        const plusButton = card.querySelector('.plus');
+        if (plusButton) {
+            const productId = plusButton.dataset.id;
+            const price = parseFloat(plusButton.dataset.price);
+            
+            // Use our enhanced setQuantity function
+            setQuantity(productId, bulkQuantity, price);
+        }
     });
+    
+    showNotification(`Applied quantity ${bulkQuantity} to all products`, 'success');
+});
     
     function updateCategoryTotal(category) {
       let total = 0;
