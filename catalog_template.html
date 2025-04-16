@@ -1,0 +1,1132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FSM PRIME | Premium Product Catalog</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <style>
+    :root {
+      --primary: #7c4dff;
+      --secondary: #651fff;
+      --accent: #00b0ff;
+      --dark: #121212;
+      --darker: #0a0a0a;
+      --light: #f8f9fa;
+      --transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      --bg-dark: #121212;
+      --card-dark: #1e1e1e;
+      --text-dark: #f0f0f0;
+      --border-dark: #333;
+      --bg-light: #f8f9fa;
+      --card-light: white;
+      --text-light: #333;
+      --border-light: #e0e0e0;
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Montserrat', sans-serif;
+      background: var(--bg-dark);
+      color: var(--text-dark);
+      min-height: 100vh;
+      overflow-x: hidden;
+      transition: background 0.3s ease, color 0.3s ease;
+    }
+    
+    body.light-mode {
+      background: var(--bg-light);
+      color: var(--text-light);
+    }
+    
+    .theme-toggle {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 100;
+      background: rgba(124, 77, 255, 0.2);
+      border: none;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: var(--primary);
+      font-size: 1.2rem;
+      transition: var(--transition);
+    }
+    
+    .theme-toggle:hover {
+      background: rgba(124, 77, 255, 0.3);
+      transform: scale(1.1);
+    }
+    
+    .catalog-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 2rem;
+      position: relative;
+      z-index: 1;
+    }
+    
+    .header {
+      text-align: center;
+      margin-bottom: 3rem;
+      position: relative;
+    }
+    
+    .header h1 {
+      font-size: 4rem;
+      font-weight: 900;
+      background: linear-gradient(45deg, var(--primary), var(--accent));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      margin-bottom: 0.5rem;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+    }
+    
+    .header .subtitle {
+      font-size: 1.8rem;
+      font-weight: 600;
+      color: var(--text-dark);
+      margin-bottom: 1rem;
+      position: relative;
+      display: inline-block;
+    }
+    
+    body.light-mode .header .subtitle {
+      color: var(--text-light);
+    }
+    
+    .header .subtitle::after {
+      content: '';
+      position: absolute;
+      bottom: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 80px;
+      height: 3px;
+      background: linear-gradient(45deg, var(--primary), var(--accent));
+      border-radius: 3px;
+    }
+    
+    .header p {
+      font-size: 1.2rem;
+      color: var(--text-dark);
+      max-width: 600px;
+      margin: 0 auto;
+      opacity: 0.8;
+    }
+    
+    body.light-mode .header p {
+      color: var(--text-light);
+    }
+    
+    .categories-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 2rem;
+      margin-bottom: 4rem;
+    }
+    
+    .category-card {
+      background: var(--card-dark);
+      border-radius: 16px;
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+      padding: 2rem;
+      text-align: center;
+      cursor: pointer;
+      transition: var(--transition);
+      position: relative;
+      overflow: hidden;
+      min-height: 200px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      border: 1px solid var(--border-dark);
+    }
+    
+    body.light-mode .category-card {
+      background: var(--card-light);
+      border: 1px solid var(--border-light);
+      box-shadow: 0 10px 30px rgba(124, 77, 255, 0.1);
+    }
+    
+    .category-card:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
+    }
+    
+    body.light-mode .category-card:hover {
+      box-shadow: 0 15px 40px rgba(124, 77, 255, 0.2);
+    }
+    
+    .category-card h2 {
+      font-size: 1.8rem;
+      margin-bottom: 0.5rem;
+      position: relative;
+      display: inline-block;
+      color: var(--text-dark);
+    }
+    
+    body.light-mode .category-card h2 {
+      color: #495057;
+    }
+    
+    .category-card h2::after {
+      content: '';
+      position: absolute;
+      bottom: -8px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 40px;
+      height: 3px;
+      background: linear-gradient(45deg, var(--primary), var(--accent));
+      border-radius: 3px;
+    }
+    
+    .category-card .product-count {
+      background: rgba(124, 77, 255, 0.1);
+      color: var(--primary);
+      padding: 0.3rem 0.8rem;
+      border-radius: 20px;
+      font-size: 0.9rem;
+      margin-top: 1rem;
+      font-weight: 600;
+    }
+    
+    .category-card .category-total {
+      margin-top: 1rem;
+      font-weight: 600;
+      color: var(--primary);
+      font-size: 1.1rem;
+    }
+    
+    .products-section {
+      display: none;
+      animation: fadeIn 0.8s ease-out;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .back-button {
+      display: inline-flex;
+      align-items: center;
+      background: var(--card-dark);
+      padding: 0.8rem 1.5rem;
+      border-radius: 50px;
+      margin-bottom: 2rem;
+      cursor: pointer;
+      transition: var(--transition);
+      border: 1px solid rgba(124, 77, 255, 0.2);
+      color: var(--primary);
+      font-size: 1rem;
+      font-weight: 600;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+    
+    body.light-mode .back-button {
+      background: var(--card-light);
+      box-shadow: 0 5px 15px rgba(124, 77, 255, 0.1);
+    }
+    
+    .back-button:hover {
+      background: rgba(124, 77, 255, 0.1);
+      transform: translateX(-5px);
+    }
+    
+    .back-button i {
+      margin-right: 8px;
+    }
+    
+    .bulk-quantity-selector {
+      display: flex;
+      align-items: center;
+      margin-bottom: 2rem;
+      background: var(--card-dark);
+      padding: 1rem;
+      border-radius: 12px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      border: 1px solid var(--border-dark);
+    }
+    
+    body.light-mode .bulk-quantity-selector {
+      background: var(--card-light);
+      border: 1px solid var(--border-light);
+      box-shadow: 0 5px 15px rgba(124, 77, 255, 0.1);
+    }
+    
+    .bulk-quantity-label {
+      margin-right: 1rem;
+      font-weight: 600;
+      color: var(--text-dark);
+    }
+    
+    body.light-mode .bulk-quantity-label {
+      color: #495057;
+    }
+    
+    .bulk-quantity-input {
+      width: 60px;
+      text-align: center;
+      margin: 0 0.5rem;
+      border: 1px solid rgba(124, 77, 255, 0.2);
+      border-radius: 5px;
+      padding: 0.5rem;
+      font-weight: 600;
+      background: var(--card-dark);
+      color: var(--text-dark);
+    }
+    
+    body.light-mode .bulk-quantity-input {
+      background: var(--card-light);
+    }
+    
+    .apply-bulk-btn {
+      background: rgba(124, 77, 255, 0.1);
+      color: var(--primary);
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: var(--transition);
+      font-weight: 600;
+    }
+    
+    .apply-bulk-btn:hover {
+      background: rgba(124, 77, 255, 0.2);
+    }
+    
+    .products-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 2rem;
+    }
+    
+    .product-card {
+      background: var(--card-dark);
+      border-radius: 12px;
+      overflow: hidden;
+      transition: var(--transition);
+      position: relative;
+      border: 1px solid var(--border-dark);
+      cursor: pointer;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+    
+    body.light-mode .product-card {
+      background: var(--card-light);
+      border: 1px solid var(--border-light);
+      box-shadow: 0 5px 20px rgba(124, 77, 255, 0.1);
+    }
+    
+    .product-card:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+    }
+    
+    body.light-mode .product-card:hover {
+      box-shadow: 0 15px 30px rgba(124, 77, 255, 0.2);
+    }
+    
+    .product-image {
+      width: 100%;
+      height: 200px;
+      object-fit: contain;
+      background: rgba(0, 0, 0, 0.1);
+      padding: 1rem;
+      border-bottom: 1px solid var(--border-dark);
+    }
+    
+    body.light-mode .product-image {
+      background: rgba(255, 255, 255, 0.8);
+      border-bottom: 1px solid var(--border-light);
+    }
+    
+    .product-info {
+      padding: 1.5rem;
+    }
+    
+    .product-name {
+      font-size: 1.1rem;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      color: #495057;
+      display: -moz-box;
+      -moz-line-clamp: 2;
+      -moz-box-orient: vertical;
+      line-clamp: 2;
+      box-orient: vertical;
+    }
+    
+    body.light-mode .product-name {
+      color: #495057;
+    }
+    
+    .product-price {
+      color: var(--primary);
+      font-size: 1.3rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+    
+    .product-price::before {
+      content: '₹';
+      margin-right: 2px;
+    }
+    
+    .product-weight {
+      font-size: 0.9rem;
+      color: var(--text-dark);
+      opacity: 0.8;
+      margin-bottom: 1rem;
+    }
+    
+    body.light-mode .product-weight {
+      color: #6c757d;
+    }
+    
+    .quantity-selector {
+      display: flex;
+      align-items: center;
+      margin-top: 1rem;
+    }
+    
+    .quantity-btn {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: rgba(124, 77, 255, 0.1);
+      border: none;
+      color: var(--primary);
+      font-weight: bold;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: var(--transition);
+    }
+    
+    .quantity-btn:hover {
+      background: rgba(124, 77, 255, 0.2);
+    }
+    
+    .quantity-input {
+      width: 50px;
+      text-align: center;
+      margin: 0 0.5rem;
+      border: 1px solid rgba(124, 77, 255, 0.2);
+      border-radius: 5px;
+      padding: 0.3rem;
+      font-weight: 600;
+      background: var(--card-dark);
+      color: var(--text-dark);
+    }
+    
+    body.light-mode .quantity-input {
+      background: var(--card-light);
+    }
+    
+    .summary-section {
+      background: var(--card-dark);
+      border-radius: 16px;
+      padding: 2rem;
+      margin-top: 3rem;
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+      border: 1px solid var(--border-dark);
+    }
+    
+    body.light-mode .summary-section {
+      background: var(--card-light);
+      border: 1px solid var(--border-light);
+      box-shadow: 0 10px 30px rgba(124, 77, 255, 0.1);
+    }
+    
+    .summary-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 1.5rem;
+      color: var(--primary);
+      text-align: center;
+    }
+    
+    .category-summary {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 1rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px dashed rgba(124, 77, 255, 0.3);
+    }
+    
+    .category-summary-name {
+      font-weight: 600;
+      color: var(--text-dark);
+    }
+    
+    body.light-mode .category-summary-name {
+      color: #495057;
+    }
+    
+    .category-summary-total {
+      font-weight: 700;
+      color: var(--primary);
+    }
+    
+    .final-total {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 1.5rem;
+      padding-top: 1.5rem;
+      border-top: 2px solid rgba(124, 77, 255, 0.3);
+      font-size: 1.2rem;
+      font-weight: 700;
+    }
+    
+    .final-total-label {
+      color: var(--text-dark);
+    }
+    
+    body.light-mode .final-total-label {
+      color: var(--text-light);
+    }
+    
+    .final-total-amount {
+      color: var(--primary);
+    }
+    
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(10px);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease-out;
+    }
+    
+    .modal-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+    
+    .product-modal {
+      background: var(--card-dark);
+      border-radius: 20px;
+      width: 90%;
+      max-width: 900px;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+      transform: scale(0.9);
+      transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.4);
+      position: relative;
+      border: 1px solid var(--border-dark);
+    }
+    
+    body.light-mode .product-modal {
+      background: var(--card-light);
+      border: 1px solid var(--border-light);
+    }
+    
+    .modal-overlay.active .product-modal {
+      transform: scale(1);
+    }
+    
+    .modal-close {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: rgba(124, 77, 255, 0.1);
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      transition: var(--transition);
+      z-index: 10;
+      border: none;
+      color: var(--primary);
+      font-size: 1.2rem;
+    }
+    
+    .modal-close:hover {
+      background: var(--primary);
+      color: white;
+      transform: rotate(90deg);
+    }
+    
+    .modal-content {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+      padding: 3rem;
+    }
+    
+    .modal-form {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      padding: 3rem;
+    }
+    
+    .modal-form label {
+      font-weight: 600;
+      color: var(--text-dark);
+    }
+    
+    body.light-mode .modal-form label {
+      color: #495057;
+    }
+    
+    .modal-form input,
+    .modal-form textarea,
+    .modal-form select {
+      width: 100%;
+      padding: 0.5rem;
+      border: 1px solid rgba(124, 77, 255, 0.2);
+      border-radius: 5px;
+      background: var(--card-dark);
+      color: var(--text-dark);
+      font-family: 'Montserrat', sans-serif;
+    }
+    
+    body.light-mode .modal-form input,
+    body.light-mode .modal-form textarea,
+    body.light-mode .modal-form select {
+      background: var(--card-light);
+    }
+    
+    .modal-form select {
+      appearance: none;
+      background-image: url('data:image/svg+xml;utf8,<svg fill="%237c4dff" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/><path d="M0 0h24v24H0z" fill="none"/></svg>');
+      background-repeat: no-repeat;
+      background-position: right 0.7rem top 50%;
+      background-size: 1.2rem;
+    }
+    
+    .modal-form button {
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 0.8rem 1.5rem;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: var(--transition);
+    }
+    
+    .modal-form button:hover {
+      background: var(--secondary);
+    }
+    
+    /* Add to your existing styles */
+    .notification {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      padding: 15px 25px;
+      border-radius: 8px;
+      color: white;
+      font-weight: 600;
+      z-index: 1000;
+      transform: translateX(100%);
+      transition: transform 0.3s ease;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .notification.show {
+      transform: translateX(0);
+    }
+
+    .notification.success {
+      background: linear-gradient(135deg, #4CAF50, #2E7D32);
+    }
+
+    .notification.error {
+      background: linear-gradient(135deg, #F44336, #C62828);
+    }
+
+    .notification.warning {
+      background: linear-gradient(135deg, #FF9800, #EF6C00);
+    }
+
+    .notification-content i {
+      margin-right: 10px;
+    }
+
+    .delete-selected-btn {
+      background: rgba(244, 67, 54, 0.1);
+      color: #F44336;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .delete-selected-btn:hover {
+      background: rgba(244, 67, 54, 0.2);
+    }
+
+    .product-checkbox-container {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      z-index: 2;
+    }
+
+    .product-checkbox {
+      position: absolute;
+      opacity: 0;
+    }
+
+    .custom-checkbox {
+      position: relative;
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      background: var(--card-dark);
+      border: 2px solid var(--primary);
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    body.light-mode .custom-checkbox {
+      background: var(--card-light);
+    }
+
+    .product-checkbox:checked + .custom-checkbox {
+      background: var(--primary);
+    }
+
+    .product-checkbox:checked + .custom-checkbox::after {
+      content: '\f00c';
+      font-family: 'Font Awesome 5 Free';
+      font-weight: 900;
+      position: absolute;
+      color: white;
+      font-size: 12px;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+
+    .select-all-checkbox {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-left: 10px;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    /* Add loading spinner for buttons */
+    .fa-spinner {
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    .bulk-upload-section {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      padding: 3rem;
+      text-align: center;
+    }
+    
+    .bulk-upload-section h2 {
+      color: var(--text-dark);
+    }
+    
+    body.light-mode .bulk-upload-section h2 {
+      color: var(--text-light);
+    }
+    
+    .bulk-upload-section p {
+      color: var(--text-dark);
+    }
+    
+    body.light-mode .bulk-upload-section p {
+      color: var(--text-light);
+    }
+    
+    .drag-drop-area {
+      border: 2px dashed rgba(124, 77, 255, 0.3);
+      border-radius: 12px;
+      padding: 2rem;
+      background: rgba(124, 77, 255, 0.05);
+      transition: var(--transition);
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 150px;
+    }
+    
+    .drag-drop-area.drag-over {
+      border-color: var(--primary);
+      background: rgba(124, 77, 255, 0.1);
+      transform: scale(1.02);
+    }
+    
+    body.light-mode .drag-drop-area {
+      background: rgba(124, 77, 255, 0.02);
+      border-color: rgba(124, 77, 255, 0.2);
+    }
+    
+    .drag-drop-area p {
+      color: var(--text-dark);
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+    
+    body.light-mode .drag-drop-area p {
+      color: #495057;
+    }
+    
+    .drag-drop-area span {
+      color: var(--primary);
+      text-decoration: underline;
+      cursor: pointer;
+    }
+    
+    .drag-drop-area i {
+      font-size: 2rem;
+      color: var(--primary);
+      margin-bottom: 1rem;
+    }
+    
+    .bulk-upload-section button {
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 0.8rem 1.5rem;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: var(--transition);
+    }
+    
+    .bulk-upload-section button:hover {
+      background: var(--secondary);
+    }
+    
+    .bulk-upload-section button:disabled {
+      background: #6c757d;
+      cursor: not-allowed;
+    }
+    
+    @media (max-width: 768px) {
+      .modal-content {
+        grid-template-columns: 1fr;
+        padding: 2rem;
+      }
+      
+      .modal-form,
+      .bulk-upload-section {
+        padding: 2rem;
+      }
+    }
+    
+    .action-buttons {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      margin-bottom: 2rem;
+    }
+    
+    .action-btn {
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 0.8rem 1.5rem;
+      border-radius: 50px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: var(--transition);
+    }
+    
+    .action-btn:hover {
+      background: var(--secondary);
+      transform: translateY(-3px);
+    }
+    
+    @media (max-width: 768px) {
+      .header h1 {
+        font-size: 2.5rem;
+      }
+      
+      .header .subtitle {
+        font-size: 1.4rem;
+      }
+      
+      .categories-grid {
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      }
+      
+      .products-grid {
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      }
+      
+      .bulk-quantity-selector {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      
+      .bulk-quantity-label {
+        margin-bottom: 0.5rem;
+      }
+      
+      .modal-main-image {
+        height: 300px;
+      }
+      
+      .modal-title {
+        font-size: 1.8rem;
+      }
+    }
+
+    /* Added styles for modal images and error/loading states */
+    .modal-main-image {
+      width: 100%;
+      height: 400px;
+      object-fit: contain;
+      border-radius: 12px;
+      background: var(--card-dark);
+    }
+    
+    body.light-mode .modal-main-image {
+      background: var(--card-light);
+    }
+    
+    .modal-category {
+      font-size: 1rem;
+      color: var(--text-dark);
+      margin-bottom: 0.5rem;
+      display: block;
+    }
+    
+    body.light-mode .modal-category {
+      color: #6c757d;
+    }
+    
+    .modal-price {
+      font-size: 1.5rem;
+      color: var(--primary);
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+    
+    .modal-price::before {
+      content: '₹';
+      margin-right: 2px;
+    }
+    
+    .modal-weight {
+      font-size: 0.9rem;
+      color: var(--text-dark);
+      margin-bottom: 1rem;
+    }
+    
+    body.light-mode .modal-weight {
+      color: #6c757d;
+    }
+    
+    .modal-description {
+      font-size: 1rem;
+      color: var(--text-dark);
+      line-height: 1.5;
+    }
+    
+    body.light-mode .modal-description {
+      color: #495057;
+    }
+    
+    .modal-quantity {
+      display: flex;
+      align-items: center;
+      margin-top: 1rem;
+    }
+    
+    .modal-quantity-label {
+      margin-right: 1rem;
+      font-weight: 600;
+      color: var(--text-dark);
+    }
+    
+    body.light-mode .modal-quantity-label {
+      color: #495057;
+    }
+    
+    .loading {
+      text-align: center;
+      font-size: 1.2rem;
+      color: var(--primary);
+      margin: 2rem 0;
+    }
+    
+    .error {
+      text-align: center;
+      font-size: 1.2rem;
+      color: #ff4d4d;
+      margin: 2rem 0;
+    }
+  </style>
+</head>
+<body>
+  <!-- Theme Toggle -->
+  <button class="theme-toggle" id="themeToggle">
+    <i class="fas fa-moon"></i>
+  </button>
+  
+  <!-- Product Modal -->
+  <div class="modal-overlay" id="productModal">
+    <div class="product-modal">
+      <button class="modal-close" id="modalClose">
+        <i class="fas fa-times"></i>
+      </button>
+      <div class="modal-content" id="modalContent">
+        <!-- Content will be inserted here by JavaScript -->
+      </div>
+    </div>
+  </div>
+  
+  <!-- Add Product Modal -->
+  <div class="modal-overlay" id="addProductModal">
+    <div class="product-modal">
+      <button class="modal-close" id="addProductModalClose">
+        <i class="fas fa-times"></i>
+      </button>
+    <!-- Replace your existing form with this -->
+    <div class="modal-form" id="addProductForm">
+      <h2>Add New Product</h2>
+      <label for="addCategory">Category</label>
+      <select id="addCategory" required>
+        <option value="" disabled selected>Select a category</option>
+        <!-- Options will be populated by JavaScript -->
+      </select>
+      <label for="addProductName">Product Name</label>
+      <input type="text" id="addProductName" placeholder="e.g., Organic Apples" required>
+      <label for="addPrice">Price (₹)</label>
+      <input type="number" id="addPrice" placeholder="e.g., 150" step="0.01" required>
+      <label for="addWeightVolume">Weight/Volume</label>
+      <input type="text" id="addWeightVolume" placeholder="e.g., 1kg" required>
+      <label for="addImageUrl">Image URL</label>
+      <input type="url" id="addImageUrl" placeholder="e.g., https://example.com/image.jpg">
+      <button id="submitProduct">Add Product</button>
+    </div>
+    </div>
+  </div>
+  
+  <!-- Bulk Upload Modal -->
+  <div class="modal-overlay" id="bulkUploadModal">
+    <div class="product-modal">
+      <button class="modal-close" id="bulkUploadModalClose">
+        <i class="fas fa-times"></i>
+      </button>
+      <div class="bulk-upload-section">
+        <h2>Bulk Upload Products</h2>
+        <p>Upload a CSV or Excel file with columns: category, product_name, price, weight_volume, product_image_url, description</p>
+        <div class="drag-drop-area" id="dragDropArea">
+          <i class="fas fa-cloud-upload-alt"></i>
+          <p>Drag & Drop your file here or <span>click to select</span></p>
+        </div>
+        <input type="file" id="bulkUploadFile" accept=".csv,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" style="display: none;">
+        <button id="submitBulkUpload" disabled>Upload File</button>
+      </div>
+    </div>
+  </div>
+  
+  <div class="catalog-container">
+    <div class="header">
+      <h1>FSM PRIME</h1>
+      <div class="subtitle">Product Catalog</div>
+      <p>Discover our exquisite collection of premium gourmet products from around the world</p>
+    </div>
+    
+    <!-- Action Buttons -->
+    <div class="action-buttons">
+      <button class="action-btn" id="addProductBtn">Add Product</button>
+      <button class="action-btn" id="bulkUploadBtn">Bulk Upload</button>
+    </div>
+    
+    <!-- Categories View -->
+    <div id="categoriesView">
+      <div class="loading" id="loading">Loading categories...</div>
+      <div class="error" id="error" style="display: none;"></div>
+      <div class="categories-grid" id="categoriesGrid">
+        <!-- Categories will be inserted here by JavaScript -->
+      </div>
+    </div>
+    
+    <!-- Products View -->
+    <div id="productsView" class="products-section">
+      <button class="back-button" onclick="showCategories()">
+        <i class="fas fa-arrow-left"></i> Back to Categories
+      </button>
+      <h2 id="categoryTitle" class="category-heading"></h2>
+      
+      <!-- Bulk Quantity Selector -->
+      <div class="bulk-quantity-selector" id="bulkQuantitySelector" style="display: none;">
+        <span class="bulk-quantity-label">Apply quantity to all products:</span>
+        <input type="number" min="0" value="0" class="bulk-quantity-input" id="bulkQuantityInput">
+        <button class="apply-bulk-btn" id="applyBulkBtn">Apply</button>
+      </div>
+      
+      <div class="products-grid" id="productsGrid"></div>
+    </div>
+    
+    <!-- Summary Section -->
+    <div class="summary-section" id="summarySection">
+      <h3 class="summary-title">Order Summary</h3>
+      <div id="categorySummaries">
+        <!-- Category summaries will be inserted here -->
+      </div>
+      <div class="final-total">
+        <span class="final-total-label">Grand Total:</span>
+        <span class="final-total-amount" id="grandTotal">₹0</span>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="supabaseclient.js"></script>
+  <script src="script.js" ></script>
+</body>
+</html>
