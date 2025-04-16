@@ -721,15 +721,27 @@ submitBulkUpload.addEventListener('click', async () => {
 // Initialize the app
 async function initializeApp() {
   try {
+    console.log('App initialization starting...');
     await ensureSupabase();
-    console.log('App initialization starting with Supabase:', window.supabase !== undefined);
+    console.log('Supabase client initialized:', window.supabase !== undefined);
+
+    const { data: testData, error: testError } = await supabase
+      .from('categories')
+      .select('*')
+      .limit(1);
     
+    console.log('Test query results:', { testData, testError });
+
+    if (testError) {
+      throw testError;
+    }
     // Populate category dropdown
     const { data: categories } = await supabase
       .from('categories')
       .select('name')
       .order('name', { ascending: true });
-    
+    console.log('Categories fetched for dropdown:', categories);
+
     const categorySelect = document.getElementById('addCategory');
     // Clear existing options except the first one
     while (categorySelect.options.length > 1) {
