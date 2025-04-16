@@ -1,3 +1,4 @@
+document.addEventListener('DOMContentLoaded', async () => {
     // Store product data and quantities
     let productData = {};
     const quantities = {};
@@ -829,4 +830,5 @@
     }
     
     // Start the application
-    document.addEventListener('DOMContentLoaded', initializeApp);
+    await initializeApp();
+    });
