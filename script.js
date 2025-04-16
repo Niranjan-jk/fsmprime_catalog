@@ -50,19 +50,23 @@ function showNotification(message, type = 'success') {
 
 async function fetchCategories() {
   try {
+    console.log('Starting to fetch categories...');
     await ensureSupabase();
-    console.log('Fetching categories from Supabase...');
-  const { data, error } = await window.supabase
-    .from('categories')
-    .select('*')
+    console.log('Supabase client confirmed available');
+    
+    const { data, error } = await window.supabase
+      .from('categories')
+      .select('*')
       .order('name', { ascending: true });
+
+    console.log('Categories query completed', { data, error });
 
     if (error) {
       console.error('Supabase categories error:', error);
       throw error;
     }
 
-    console.log('Categories fetched:', data);
+    console.log('Categories fetched successfully:', data);
     return data;
 
   } catch (error) {
