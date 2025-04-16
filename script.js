@@ -6,6 +6,7 @@ let currentCategory = '';
 let selectedProducts = new Set();
 let currentCategoryProducts = [];
 
+console.log('Supabase instance:', window.supabase);
 // Wait for supabase to be available
 function ensureSupabase() {
   return new Promise((resolve) => {
@@ -50,9 +51,9 @@ async function fetchCategories() {
   try {
     await ensureSupabase();
     console.log('Fetching categories from Supabase...');
-    const { data, error } = await supabase
-      .from('categories')
-      .select('*')
+  const { data, error } = await window.supabase
+    .from('categories')
+    .select('*');
       .order('name', { ascending: true });
 
     if (error) {
