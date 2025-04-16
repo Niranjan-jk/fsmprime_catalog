@@ -7,19 +7,25 @@ let currentCategory = '';
 let selectedProducts = new Set();
 let currentCategoryProducts = [];
   
-console.log("Supabase URL:", supabase.supabaseUrl);
-console.log("Supabase Key:", supabase.supabaseKey);
-
-// Test a simple query
-supabase
+// Test query with proper error handling
+console.log("Running test query...");
+const { data, error } = await supabase
   .from('categories')
   .select('*')
-  .limit(1)
-  .then(({ data, error }) => {
-    console.log("Test Query Results:", { data, error });
-  })
-  .catch(err => console.error("Query Failed:", err));
-console.log('Supabase instance:', window.supabase);
+  .limit(1);
+
+console.log("Query completed. Results:", {
+  data: data ? "Received data" : "NO DATA",
+  error: error || "No error"
+});
+
+if (error) {
+  console.error("Detailed Supabase error:", {
+    message: error.message,
+    code: error.code,
+    details: error.details
+  });
+}
 // Wait for supabase to be available
 function ensureSupabase() {
   return new Promise((resolve) => {
