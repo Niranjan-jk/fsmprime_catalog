@@ -762,4 +762,4 @@ async function initializeApp() {
 
 // Start the application
 document.addEventListener('DOMContentLoaded', initializeApp);
-}
+});
