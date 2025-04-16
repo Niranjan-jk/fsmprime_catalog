@@ -816,7 +816,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             document.body.style.overflow = 'auto';
           }
         });
-        
+        document.getElementById('backToCategoriesBtn').addEventListener('click', showCategories);
+          
         document.getElementById('modalClose').addEventListener('click', function() {
           document.getElementById('productModal').classList.remove('active');
           document.body.style.overflow = 'auto';
