@@ -974,3 +974,4 @@ function showProducts(category) {
     
     // Start the application
     await initializeApp();
+    });
